@@ -22,7 +22,7 @@ def CreateCSV_Sphere( CSVfilename, fixedDatetimeString, fixedAltitude, LatitudeS
     linesWritten = 0 # count how many lines you write in the CSV in order to inform the user at the end.
     
     if CSVfilename is None  or  len(CSVfilename)==0:
-        CSVfilename = "DataFiles/TMP/sphere.csv"
+        CSVfilename = "../../NAS/Data_Files/TMP/sphere.csv"
     
 
     # open the new file as csv
