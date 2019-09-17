@@ -1,35 +1,33 @@
 """
-Constructs an orbit filename from the orbit properties.
+Constructs and returns an orbit full-path filename from the orbit properties.
 The filename includes all parameters required to select the appropriate orbit.
 All filenames  have the same length and same number of parameters. 
-If OrbitFilename is provided then the rest arguments are ignored.
-FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv
-DESCRIPTION:
+In case OrbitFilename and EvtXY are empty then an empty string is returned.
+FILE FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv
+  Parameter OrbitFilename:
+    If it is not empty then the rest arguments are ignored. 
+    If it contains slashes then is is assumed it is a full path name and it is returned as it is.
+    If it does not contain slashes then the orbits path is added.
+    
   Parameter EvtXY values:
-    EVTXS	 X Event, Single Orbit
+    EVTXS    X Event, Single Orbit
     EVTXA    X Event, All Orbit
     EVT1Y    1st Event: St Patrick’s day event [17 Mar 2015 – 20 Mar 2015]
-    EVT2Y    2nd Event
-    EVT3Y    3rd Event
-	...      ...
+    EVT2Y    2nd Event ...  ...
 	
   Parameter TYP	values:
     LLA    Time,Latitude Longitude Altitude 
     VEL    Time,VmagVxVyVz
     PTG    Time, X_GSE, Y_GSE, Z_GSE, RamX_GSE, RamY_GSE, RamZ_GSE
 
-  Parameter PerYYY	values:
-    PER120    Perigee Altitude at 120km
-    PER150    Perigee Altitude at 150km
+  Parameter PerYYY values:
+    PER120, PER150    Perigee Altitude at 120km or 150km
 
   Parameter LatZZ values:
-    LAT00    Perigee Latitude at 0°
-    LAT40    Perigee Latitude at 40°
-    LAT80    Perigee Latitude at 80°
+    LAT00, LAT40, LAT80    Perigee Latitude at 0°, 40° or 80°
 	
   Parameter SRXXHZ values:
-    SRT16Hz    Sampling rate 16Hz
-    SRT01Hz    Sampling rate 1Hz
+    SRT16Hz, SRT01Hz    Sampling rate 16Hz or 1HZ
 	
   Parameter SC values:
     MSC    Mother Spacecraft
@@ -39,8 +37,11 @@ def OrbitSelector( OrbitFilename, EvtXY, TYP, PerYYY, LatZZ, SRXXHZ, SC ):
     if len(OrbitFilename)==0  and  len(EvtXY)==0 :
         return ""
     elif len(OrbitFilename) > 0:
-        return "DataFiles/OrbitData/" + OrbitFilename
+        if "/" in OrbitFilename: 
+            return OrbitFilename
+        else:
+            return "../../NAS/Data_Files/OrbitData/" + OrbitFilename
     else:
-        return "DataFiles/OrbitData/" + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
+        return "../../NAS/Data_Files/OrbitData/" + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
 
 
