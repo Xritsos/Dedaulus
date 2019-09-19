@@ -15,12 +15,13 @@ import pandas as pd
 #file to read as input from input folder, and parameter could be
 # "Op", "O2p","Te","Ti", "Ne" or "" to Output selection
 def IRI16(file_to_read_full_path, parameter):
+    print (file_to_read_full_path)
     if file_to_read_full_path is None or len(file_to_read_full_path)==0: 
         return "" 
     
     # copy input file so that can be used by IRI
     OnlyFilename =  file_to_read_full_path[ file_to_read_full_path.rfind('/')+1 : -4 ]
-    copyfile(file_to_read_full_path, "SourceCode/ModulesSourceCode/input/" + OnlyFilename + ".csv")
+    #copyfile(file_to_read_full_path, "../../NAS/Data_Files/OrbitData/" + OnlyFilename + ".csv")
 
 
     #variable_classes.save_name = file_to_read_full_path
@@ -30,7 +31,8 @@ def IRI16(file_to_read_full_path, parameter):
         parameter="all"
     input_path=os.path.dirname(file_to_read_full_path)
     #export_name=OnlyFilename+"_IRI16_"+parameter+".csv"
-    export_name=os.path.dirname(file_to_read_full_path)+"/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_IRI16_"+parameter+".csv"
+    #export_name=os.path.dirname(file_to_read_full_path)+"/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_IRI16_"+parameter+".csv"
+    export_name="../../NAS/Data_Files/ModelsOutput/IRI/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_IRI16_"+parameter+".csv"
     #export_name_Checkdir="SourceCode/ModulesSourceCode/Outputs/"+export_name
     export_name_Checkdir=export_name
     

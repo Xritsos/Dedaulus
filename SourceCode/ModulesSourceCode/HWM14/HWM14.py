@@ -22,7 +22,7 @@ def HWM14(file_to_read_full_path, parameter):
 
     # copy input file so that can be used by IRI
     OnlyFilename =  file_to_read_full_path[ file_to_read_full_path.rfind('/')+1 : -4 ]
-    copyfile(file_to_read_full_path, "SourceCode/ModulesSourceCode/input/" + OnlyFilename + ".csv")
+    #copyfile(file_to_read_full_path, "../../NAS/Data_Files/OrbitData/" + OnlyFilename + ".csv")
 
 
     #variable_classes.save_name = file_to_read_full_path
@@ -32,7 +32,9 @@ def HWM14(file_to_read_full_path, parameter):
         parameter="all"
     input_path=os.path.dirname(file_to_read_full_path)
     #export_name=OnlyFilename+"_HWM14_"+parameter+".csv"
-    export_name=os.path.dirname(file_to_read_full_path)+"/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_HWM14_"+parameter+".csv"
+    #export_name=os.path.dirname(file_to_read_full_path)+"/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_HWM14_"+parameter+".csv"
+    export_name="../../NAS/Data_Files/ModelsOutput/HWM/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_HWM14_"+parameter+".csv"
+    
     #export_name_Checkdir="SourceCode/ModulesSourceCode/Outputs/"+export_name
     export_name_Checkdir=export_name
 
