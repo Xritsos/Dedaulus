@@ -38,7 +38,7 @@
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import pandas as pd
-import interpolation
+import SourceCode.ModulesSourceCode.Interpolator.interpolation as interpolation 
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
@@ -46,10 +46,9 @@ from datetime import datetime
 import os
 
 def Interpolator(model,model_data_file,orbit_file,save,VAR):
-# directory-->string:: output directory
-# model_data_file,model_data_secondary_file--> strings:: model data files in data folder netCDF file provided from modellers
+# model-->string:: name of model eg "TIEGCM"
+# model_data_file--> string:: model data files in data folder netCDF file provided from modellers
 # orbit_file-->string :: orbit filename in Time-Lat-Lon-Alt format as porvided in Jupyter
-# max_alt-->float:: max altitude for the interpolation--depends on model and user preference
 # save--> Logical:: if true saves interpolated values to directory
 # VAR--> string:: variable to inteprolate, must be  one of the variables included in the model data
 #Outputs:: Plots+ 1 csv file
@@ -63,7 +62,7 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
 
     #============== Read File + Orbitt and Manipulate Data=======
     
-    TIEGCM=Dataset("../../../../../NAS/TIEGCM_DATA/"+model_data_file)
+    TIEGCM=Dataset("../../NAS/TIEGCM_DATA/"+model_data_file)
     df = pd.read_csv("../../../../../NAS/Data_Files/OrbitData/"+orbit_file+".csv")
 
     # =================================================
