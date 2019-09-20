@@ -38,14 +38,15 @@
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import pandas as pd
-import SourceCode.ModulesSourceCode.Interpolator.interpolation as interpolation
+import interpolation
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from datetime import datetime
 import os
 
-def Interpolator(model_data_file,orbit_file,save,VAR,max_alt):
+def Interpolator(model,model_data_file,orbit_file,save,VAR):
+# directory-->string:: output directory
 # model_data_file,model_data_secondary_file--> strings:: model data files in data folder netCDF file provided from modellers
 # orbit_file-->string :: orbit filename in Time-Lat-Lon-Alt format as porvided in Jupyter
 # max_alt-->float:: max altitude for the interpolation--depends on model and user preference
@@ -55,42 +56,37 @@ def Interpolator(model_data_file,orbit_file,save,VAR,max_alt):
 
 
     # ******************************************************************************
+
     # Interpolation Site Min and Max Altitude Along Track Depending on Model and User Preference
     min_alt=130
-
+    max_alt=480                            
 
     #============== Read File + Orbitt and Manipulate Data=======
-    TIEGCM=Dataset(model_data_file)
-    df = pd.read_csv(orbit_file)
+    
+    TIEGCM=Dataset("../../../../../NAS/TIEGCM_DATA/"+model_data_file)
+    df = pd.read_csv("../../../../../NAS/Data_Files/OrbitData/"+orbit_file+".csv")
 
     # =================================================
-
-    # Pull data from orbit
-    # daed_lat_temp = df["Lat (deg)"]
-    # daed_lon_temp = df["Lon (deg)"]
-    # daed_alt_temp = df["Alt (km)"]
-    # daed_time_temp = df["Time (UTCG)"]
-
-
-
+    
+#   Get Orbit Data from Dataset
     daed_lat_temp = df["Lat_GEOD(deg)"]
     daed_lon_temp = df["Lon_GEOD(deg)"]
     daed_alt_temp = df["Height_WGS84 (km)"]
     daed_time_temp = df["Epoch(UTCG)"]
 
 
-    # Sample Orbit and Find Positions Below 450km
+    # Sample Orbit and Find Positions Below max alt!
     counter=0
     for i in range(0,len(daed_alt_temp)):
         if (daed_alt_temp[i] < max_alt and daed_alt_temp[i] > min_alt):
             counter=counter+1
-
-
-
+            
     # ******************************************************************************
 
+    
 
     # ******************************************************************************
+   
     # Allocate Arrays
     daed_lat=np.zeros((counter))
     daed_lon=np.zeros((counter))
@@ -108,16 +104,16 @@ def Interpolator(model_data_file,orbit_file,save,VAR,max_alt):
             daed_alt[counter]=daed_alt_temp[i]
             counter=counter+1
 
-    #Transfrom Lon to Match TIEGCM
+    #Transfrom Lon to Match TIEGCM (-180-180 deg)
     for i in range (0, len(daed_alt)):
-        # if (daed_lon[i] >180 and daed_lon[i] <360):
-            # daed_lon[i]=180-daed_lon[i]
             daed_lon[i]=daed_lon[i]-180
+    
     # ******************************************************************************
 
 
     # ******************************************************************************
-    # Pull data from Model
+    
+    # Get data from Model Dataset
     grid_lat=TIEGCM.variables['lat'][:]
     grid_lon=TIEGCM.variables['lon'][:]
     grid_lev=TIEGCM.variables['ilev'][:]
@@ -126,25 +122,30 @@ def Interpolator(model_data_file,orbit_file,save,VAR,max_alt):
 
     # Select Variable to Interpolate
     ne=TIEGCM.variables[VAR][:]
-    surf_Z=ne[1,10,:,:]     # To Surf Plot At The End
-
+    
+    # For surface plotting during debugging
+    surf_Z=ne[1,10,:,:]     
+    
     # ******************************************************************************
 
 
+    
     # ******************************************************************************
+    
     #Find model's temporal resolution
     model_dt=(grid_time[1]-grid_time[0])*60   #in seconds
     orbit_dt=1/16                             #in seconds
-
-    print("Timestep of Model Data is ",model_dt, "seconds")
-    print("Timestep of Orbit Data is ",orbit_dt, "seconds")
+    #print("Timestep of Model Data is ",model_dt, "seconds")
+    #print("Timestep of Orbit Data is ",orbit_dt, "seconds")
+    
     # ******************************************************************************
 
 
+    
     # ******************************************************************************
+    
     #Allocate a matrix for the interpolated values
     int_data=np.zeros(((counter)))
-
     print("Interpolation Starting...",counter, "Positions to Interpolate")
     #*********************Call Interpolation Subroutines***************************
     interpolation.daed_interp(grid_lat,grid_lon,grid_lev,daed_lat,daed_lon,daed_alt,zg,model_dt,orbit_dt,ne,int_data)
@@ -152,36 +153,31 @@ def Interpolator(model_data_file,orbit_file,save,VAR,max_alt):
     print("Interpolation Done!")
 
     # ******************************************************************************
-    #
+    
 
 
+    # ******************************************************************************
 
-    #Export Data
+    #Export Data to NAS
     if save==True:
-        # if not os.path.exists(directory):
-        #     os.makedirs(directory)
+        directory = "../../../../../NAS/Data_Files/ModelsOutput/Interpolation/"
 
         Exports={'Time (UTCG)':daed_time,'Lat (deg)':daed_lat,'Lon (deg)':daed_lon,
                         'Alt (km)':daed_alt,'Interpolated_Data':int_data }
+        
         df = DataFrame(Exports, columns= ['Time (UTCG)', 'Lat (deg)','Lon (deg)','Alt (km)','Interpolated_Data'])
 
-        export_csv = df.to_csv ( "DataFiles/ModelsOutput/" + orbit_file+"_" +VAR + '.csv', index = None, header=True)
-
-        # Exports={'Lat (deg)':daed_lat,'Lon (deg)':daed_lon,
-        #                 'Alt (km)':daed_alt,'Interpolated_Data':int_data }
-        # df = DataFrame(Exports, columns= [ 'Lat (deg)','Lon (deg)','Alt (km)','Interpolated_Data'])
-        #
-        # export_csv = df.to_csv (orbit_file+"_" +VAR + '.csv', index = None, header=True)
+        export_csv = df.to_csv (directory+orbit_file+"_" + model+ "_"  +VAR + '.csv', index = None, header=True)
+        print( "Output Saved!","Path-->", directory+orbit_file+"_" + model+ "_"  +VAR + '.csv')
     # ******************************************************************************
 
 
+    
     # ******************************************************************************
     # Plotting
     xaxis=np.arange(0,len(int_data))
     plt.figure(1)
     plt.scatter(xaxis/(1*60),int_data,c=daed_alt,s=1)
-    # plt.scatter(daed_alt,int_data,c=daed_alt,s=0.05)
-    # plt.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
     plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
     plt.title("TIEGCM:" +VAR+" Along Daedalus' Orbit")
     plt.xlabel("Time [Minutes]")
@@ -200,19 +196,17 @@ def Interpolator(model_data_file,orbit_file,save,VAR,max_alt):
 
     plt.show()
     # ******************************************************************************
-    return (orbit_file+"_" +VAR+".csv")
+
+    return
 
 
 
 # ******************************************************************************
 
-# # # Example Call
-# directory="outputs"
-# model_data_file="Data/tiegcm_dres.s_mar2015_amie_v1_01.nc"
-# model_data_file="Data/tiegcm_s_24900.nc"
-# orbit_file="Data/DAED_ORB_Evt0_LLA_Per120_Lat00_Srt01Hz_Msc(1)"
-# orbit_file="Data/DAED_ORB_Evt0_LLA_Per120_Lat80_Srt16Hz_Msc"
-# save=False
+# Example Call
+# model_data_file='tiegcm_s_24900.nc'
+# orbit_file="DAED_ORB_Evt0_LLA_Per120_Lat00_Srt01Hz_Msc"
+# save=True
 # VAR="NE"
-# max_alt=450
-# DaedalusInterpolator(directory,model_data_file,orbit_file,save,VAR,max_alt)
+# model="TIEGCM"
+# DaedalusInterpolator(model,model_data_file,orbit_file,save,VAR)
