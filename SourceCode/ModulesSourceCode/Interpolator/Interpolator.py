@@ -63,7 +63,7 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
     #============== Read File + Orbitt and Manipulate Data=======
     
     TIEGCM=Dataset("../../NAS/TIEGCM_DATA/"+model_data_file)
-    df = pd.read_csv("../../../../../NAS/Data_Files/OrbitData/"+orbit_file+".csv")
+    df = pd.read_csv(orbit_file+".csv")
 
     # =================================================
     
@@ -159,14 +159,14 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
 
     #Export Data to NAS
     if save==True:
-        directory = "../../../../../NAS/Data_Files/ModelsOutput/Interpolation/"
+        directory = "../../NAS/Data_Files/ModelsOutput/Interpolation/"
 
         Exports={'Time (UTCG)':daed_time,'Lat (deg)':daed_lat,'Lon (deg)':daed_lon,
                         'Alt (km)':daed_alt,'Interpolated_Data':int_data }
         
         df = DataFrame(Exports, columns= ['Time (UTCG)', 'Lat (deg)','Lon (deg)','Alt (km)','Interpolated_Data'])
 
-        export_csv = df.to_csv (directory+orbit_file+"_" + model+ "_"  +VAR + '.csv', index = None, header=True)
+        export_csv = df.to_csv (orbit_file+"_" + model+ "_"  +VAR + '.csv', index = None, header=True)
         print( "Output Saved!","Path-->", directory+orbit_file+"_" + model+ "_"  +VAR + '.csv')
     # ******************************************************************************
 
