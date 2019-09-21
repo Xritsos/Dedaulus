@@ -166,8 +166,13 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
         
         df = DataFrame(Exports, columns= ['Time (UTCG)', 'Lat (deg)','Lon (deg)','Alt (km)','Interpolated_Data'])
 
-        export_csv = df.to_csv (orbit_file+"_" + model+ "_"  +VAR + '.csv', index = None, header=True)
-        print( "Output Saved!","Path-->", directory+orbit_file+"_" + model+ "_"  +VAR + '.csv')
+        
+        
+#     input_path=os.path.dirname(orbit_file)
+        export_name="../../NAS/Data_Files/ModelsOutput/Interpolation/"+os.path.splitext(os.path.basename(orbit_file))[0]+"_"+model+ "_"+ VAR+".csv"
+            
+        export_csv = df.to_csv (export_name, index = None, header=True)
+#       print( "Output Saved!","Path-->", directory+orbit_file+"_" + model+ "_"  +VAR + '.csv')
     # ******************************************************************************
 
 
