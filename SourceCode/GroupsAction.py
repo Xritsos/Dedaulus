@@ -154,6 +154,6 @@ def Execute_IGRF():
 	Display( '    IGRF( ' , CreateCSV_Sphere_theCSVfilename,', ' , PanelDisplayer.WIDGET_IGRF_Variable_forMeshgrid.value , ' ) results:')
 	Display( '          MeshgridResultCSV: ' + str(IGRF_MeshgridResultCSV) )
 	PlotGlobe( IGRF_MeshgridResultCSV, IGRF_OrbitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
-	Display( '    PlotGlobe( ' , IGRF_MeshgridResultCSV,', ' , IGRF_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
+	Display( '    PlotGlobe( ' ,  IGRF_MeshgridResultCSV,', ' , IGRF_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
 	Display( '          -void-' )
 	Display('')
