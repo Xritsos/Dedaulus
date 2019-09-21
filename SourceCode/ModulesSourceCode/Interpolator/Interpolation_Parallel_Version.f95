@@ -60,6 +60,7 @@ allocate(alts(size(grid_lev)))
 ! ~~~~~~~~~~~~~~~~~~~~~~~~~MAIN LOOP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 nThreads=omp_get_max_threads ()
+print*, "Interpolating on:",nThreads,"Threads"
 thread_used=0
 ! SET UP OpenMP
 !$OMP PARALLEL DO                   &
@@ -82,12 +83,21 @@ do i=1,size(daed_alt)
     if (daed_lat(i) .le. -87.5) then
       lat_temp=-87.4
     endif
+
+
   ! Find Daedalus local positions r,theta
+
+  if (daed_lon(i) .ge. 177.5) then
+    phi_local=size(grid_lon)
+
+  else
+
+    call local_positions(size(grid_lon),daed_lon(i),grid_lon,phi_local)
+
+  endif
+
+
   call local_positions(size(grid_lat),lat_temp,grid_lat,theta_local)
-  call local_positions(size(grid_lon),daed_lon(i),grid_lon,phi_local)
-
-
-
   ! Translate pressure levels to altitude from geographic height
   alts(:)=zg(counter,:,theta_local,phi_local)/100000
   call local_positions(size(alts),daed_alt(i),alts,r_local)
@@ -101,7 +111,7 @@ do i=1,size(daed_alt)
 
 
   dx=abs(((daed_alt(i)-alts(r_local))/deltarho))
-  dy=abs(((daed_lat(i)-grid_lat(theta_local))/deltatheta))
+  dy=abs(((lat_temp-grid_lat(theta_local))/deltatheta))
   dz=abs(((daed_lon(i)-grid_lon(phi_local))/deltaphi))
   deltarho=alts(r_local+1)-alts(r_local)
 
@@ -123,10 +133,19 @@ do i=1,size(daed_alt)
   m(i)=m(i)+  ne(counter,r_local+1,theta_local,phi_local)*w2
   m(i)=m(i)+  ne(counter,r_local,theta_local+1,phi_local)*w3
   m(i)=m(i)+  ne(counter,r_local+1,theta_local+1,phi_local)*w4
-  m(i)=m(i)+  ne(counter,r_local,theta_local,phi_local+1)*w5
-  m(i)=m(i)+  ne(counter,r_local+1,theta_local,phi_local+1)*w6
-  m(i)=m(i)+  ne(counter,r_local,theta_local+1,phi_local+1)*w7
-  m(i)=m(i)+  ne(counter,r_local+1,theta_local+1,phi_local+1)*w8
+
+  if (daed_lon(i) .ge. 177.5) then
+    m(i)=m(i)+  ne(counter,r_local,theta_local,1)*w5
+    m(i)=m(i)+  ne(counter,r_local+1,theta_local,1)*w6
+    m(i)=m(i)+  ne(counter,r_local,theta_local+1,1)*w7
+    m(i)=m(i)+  ne(counter,r_local+1,theta_local+1,1)*w8
+
+  else
+    m(i)=m(i)+  ne(counter,r_local,theta_local,phi_local+1)*w5
+    m(i)=m(i)+  ne(counter,r_local+1,theta_local,phi_local+1)*w6
+    m(i)=m(i)+  ne(counter,r_local,theta_local+1,phi_local+1)*w7
+    m(i)=m(i)+  ne(counter,r_local+1,theta_local+1,phi_local+1)*w8
+  endif
 
 enddo
 !$OMP END PARALLEL DO
