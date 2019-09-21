@@ -13,7 +13,7 @@ import pandas as pd
 
 # start load datafile
 #file to read as input from input folder, and parameter could be
-# "Op", "O2p","Te","Ti", "Ne" or "" to Output selection
+# "Op", "O2p","Te","Ti", "Ne", "NOp" or "" to Output selection
 def IRI16(file_to_read_full_path, parameter):
     print (file_to_read_full_path)
     if file_to_read_full_path is None or len(file_to_read_full_path)==0: 
