@@ -58,12 +58,12 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
 
     # Interpolation Site Min and Max Altitude Along Track Depending on Model and User Preference
     min_alt=130
-    max_alt=480                            
+    max_alt=470                            
 
     #============== Read File + Orbitt and Manipulate Data=======
     
     TIEGCM=Dataset("../../NAS/TIEGCM_DATA/"+model_data_file)
-    df = pd.read_csv(orbit_file+".csv")
+    df = pd.read_csv(orbit_file)
 
     # =================================================
     
@@ -201,7 +201,7 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
     plt.show()
     # ******************************************************************************
 
-    return
+    return(export_name)
 
 
 
