@@ -78,7 +78,7 @@ def Construct_Interpolator():
 	WIDGET_Interpolator_model.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Interpolator_model,)
 	global WIDGET_Interpolator_model_data_file
-	WIDGET_Interpolator_model_data_file = widgets.Text(value=" tiegcm_s_24900.nc")
+	WIDGET_Interpolator_model_data_file = widgets.Text(value="tiegcm_s_24900.nc")
 	WIDGET_Interpolator_model_data_file.description = 'model_data_file'
 	WIDGET_Interpolator_model_data_file.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Interpolator_model_data_file,)
