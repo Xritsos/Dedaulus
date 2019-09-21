@@ -14,7 +14,7 @@ def Construct_Interpolator():
 	InputsPanel = widgets.VBox()
 	InputsPanel.layout.min_width = '330px'
 	global WIDGET_OrbitSelector_Filename
-	WIDGET_OrbitSelector_Filename = widgets.Text()
+	WIDGET_OrbitSelector_Filename = widgets.Text("DAED_ORB_Evt0_LLA_Per150_Lat80_Srt01Hz_Msc.csv")
 	WIDGET_OrbitSelector_Filename.description = 'Filename'
 	WIDGET_OrbitSelector_Filename.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_OrbitSelector_Filename,)
