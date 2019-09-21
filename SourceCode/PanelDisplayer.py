@@ -78,7 +78,7 @@ def Construct_Interpolator():
 	WIDGET_Interpolator_model.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Interpolator_model,)
 	global WIDGET_Interpolator_model_data_file
-	WIDGET_Interpolator_model_data_file = widgets.Text(value="../../NAS/TIE-GCM_2015_StPatricksDayStorm_HAO/tiegcm_dres.s_mar2015_amie_v1_01.nc")
+	WIDGET_Interpolator_model_data_file = widgets.Text(value=" tiegcm_s_24900.nc")
 	WIDGET_Interpolator_model_data_file.description = 'model_data_file'
 	WIDGET_Interpolator_model_data_file.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Interpolator_model_data_file,)
@@ -100,7 +100,7 @@ def Construct_Interpolator():
 	# Create widget for the moudle black-box body
 	Interpolator_Btn = widgets.Button (
 		description='Interpolator',
-		tooltip="model --> String με το μοντελο πχ TIEGCM\nmodel data file --> Datafile με το μοντελο, netCDF4\norbit file --> orbit file .csv\nsave --> logical True or Fasle\nVAR -->string variable to interpolate eg NE",
+		tooltip="model-->string:: name of model eg TIEGCM\n model_data_file--> string:: model data files stored on DaedalusNAS\n orbit_file-->string :: orbit filename in Time-Lat-Lon-Alt format stored on DaedalusNAS\n save--> Logical:: if true saves interpolated values to directory\n VAR--> string:: variable to inteprolate, must be  one of the variables included in the model data\nOutputs:: Plots+ 1 csv file stored on DaedalusNAS in ModelOutputs/Interpolator",
 	)
 	Interpolator_Btn.layout.min_width = '200px'
 	Interpolator_Btn.style.button_color = 'gold'
@@ -158,476 +158,6 @@ def Construct_Interpolator():
 	OutputsPanel.layout.min_width = '300px'
 	Interpolator_Panel.children += (OutputsPanel,)
 	return Interpolator_Panel
-
-
-def Construct_IGRF():
-	#Create Containers
-	IGRF_Panel = widgets.Box()
-	IGRF_Panel.layout.overflow_x = 'scroll'
-	IGRF_Panel.layout.flex_flow = 'row'
-	IGRF_Panel.layout.display = 'flex'
-	########
-	## GUI code for module 'OrbitSelector'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	global WIDGET_OrbitSelector_Filename
-	WIDGET_OrbitSelector_Filename = widgets.Text()
-	WIDGET_OrbitSelector_Filename.description = 'Filename'
-	WIDGET_OrbitSelector_Filename.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_Filename,)
-	global WIDGET_OrbitSelector_EvtXY
-	WIDGET_OrbitSelector_EvtXY = widgets.Dropdown( options=['', 'Evt0', 'Evt1', 'Evt2', 'Evt3', 'Evt4', 'Evt5', 'Evt6', 'Evt7', 'Evt8', 'Evt9'], description='Variable')
-	WIDGET_OrbitSelector_EvtXY.description = 'EvtXY'
-	WIDGET_OrbitSelector_EvtXY.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_EvtXY,)
-	global WIDGET_OrbitSelector_TYP
-	WIDGET_OrbitSelector_TYP = widgets.Dropdown( options=['LLA', 'VEL', 'PTG'], description='Variable')
-	WIDGET_OrbitSelector_TYP.description = 'TYP'
-	WIDGET_OrbitSelector_TYP.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_TYP,)
-	global WIDGET_OrbitSelector_PerYYY
-	WIDGET_OrbitSelector_PerYYY = widgets.Dropdown( options=['Per120', 'Per150'], description='Variable')
-	WIDGET_OrbitSelector_PerYYY.description = 'PerYYY'
-	WIDGET_OrbitSelector_PerYYY.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_PerYYY,)
-	global WIDGET_OrbitSelector_LatZZ
-	WIDGET_OrbitSelector_LatZZ = widgets.Dropdown( options=['Lat00', 'Lat40', 'Lat80'],  description='Variable')
-	WIDGET_OrbitSelector_LatZZ.description = 'LatZZ'
-	WIDGET_OrbitSelector_LatZZ.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_LatZZ,)
-	global WIDGET_OrbitSelector_SRXXHZ
-	WIDGET_OrbitSelector_SRXXHZ = widgets.Dropdown( options=['Srt16Hz', 'Srt01Hz'],  description='Variable')
-	WIDGET_OrbitSelector_SRXXHZ.description = 'SRXXHZ'
-	WIDGET_OrbitSelector_SRXXHZ.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_SRXXHZ,)
-	global WIDGET_OrbitSelector_SC
-	WIDGET_OrbitSelector_SC = widgets.Dropdown( options=['Msc', 'Ssc'],  description='Variable')
-	WIDGET_OrbitSelector_SC.description = 'SC'
-	WIDGET_OrbitSelector_SC.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_SC,)
-	IGRF_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	OrbitSelector_Btn = widgets.Button (
-		description='OrbitSelector',
-		tooltip="Constructs and returns an orbit full-path filename from the orbit properties.\nThe filename includes all parameters required to select the appropriate orbit.\nAll filenames  have the same length and same number of parameters. \nIn case OrbitFilename and EvtXY are empty then an empty string is returned.\nFILE FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv\n  Parameter OrbitFilename:\n    If it is not empty then the rest arguments are ignored. \n    If it contains slashes then is is assumed it is a full path name and it is returned as it is.\n    If it does not contain slashes then the orbits path is added.\n    \n  Parameter EvtXY values:\n    EVTXS    X Event, Single Orbit\n    EVTXA    X Event, All Orbit\n    EVT1Y    1st Event: St Patrick’s day event [17 Mar 2015 – 20 Mar 2015]\n    EVT2Y    2nd Event ...  ...\n \n  Parameter TYP values:\n    LLA    Time,Latitude Longitude Altitude \n    VEL    Time,VmagVxVyVz\n    PTG    Time, X_GSE, Y_GSE, Z_GSE, RamX_GSE, RamY_GSE, RamZ_GSE\n  Parameter PerYYY values:\n    PER120, PER150    Perigee Altitude at 120km or 150km\n  Parameter LatZZ values:\n    LAT00, LAT40, LAT80    Perigee Latitude at 0°, 40° or 80°\n \n  Parameter SRXXHZ values:\n    SRT16Hz, SRT01Hz    Sampling rate 16Hz or 1HZ\n \n  Parameter SC values:\n    MSC    Mother Spacecraft\n    SSC    Sub-Spacecraft\n",
-	)
-	OrbitSelector_Btn.layout.min_width = '200px'
-	OrbitSelector_Btn.style.button_color = 'YellowGreen'
-	IGRF_Panel.children += (OrbitSelector_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_OrbitSelector_OrbitFilename = widgets.Label(value='  --> OrbitFilename  ')
-	WIDGET_OrbitSelector_OrbitFilename.layout.border = '1px dashed green'
-	WIDGET_OrbitSelector_OrbitFilename.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_OrbitSelector_OrbitFilename.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitFilename,)
-	IGRF_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'IGRF'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	WIDGET_IGRF_CSVfilename_forOrbit = widgets.Label(value='  OrbitSelector.OrbitFilename --> CSVfilename_forOrbit  ')
-	WIDGET_IGRF_CSVfilename_forOrbit.layout.border = '1px dashed blue'
-	WIDGET_IGRF_CSVfilename_forOrbit.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_IGRF_CSVfilename_forOrbit,)
-	global WIDGET_IGRF_Variable_forOrbit
-	WIDGET_IGRF_Variable_forOrbit = widgets.Dropdown( options=['', 'B', 'Bx', 'By', 'Bz'], value='', description='Variable')
-	WIDGET_IGRF_Variable_forOrbit.description = 'Variable_forOrbit'
-	WIDGET_IGRF_Variable_forOrbit.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_IGRF_Variable_forOrbit,)
-	IGRF_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	IGRF_Btn = widgets.Button (
-		description='IGRF',
-		tooltip="International Geomagnetic Reference Field empirical model (IGRF)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the IGRF calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'B'  for magnetic field\n    'Bx' for magnetic field component at x axis\n    'By' for magnetic field component at y axis\n    'Bz' for magnetic field component at z axis\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,B,Bx,By,Bz",
-	)
-	IGRF_Btn.layout.min_width = '200px'
-	IGRF_Btn.style.button_color = 'gold'
-	IGRF_Panel.children += (IGRF_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_IGRF_OrbitResultCSV = widgets.Label(value='  --> OrbitResultCSV  ')
-	WIDGET_IGRF_OrbitResultCSV.layout.border = '1px dashed green'
-	WIDGET_IGRF_OrbitResultCSV.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_IGRF_OrbitResultCSV.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_IGRF_OrbitResultCSV,)
-	IGRF_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'CreateCSV_Sphere'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	global WIDGET_CreateCSV_Sphere_CSVfilename
-	WIDGET_CreateCSV_Sphere_CSVfilename = widgets.Text(value="")
-	WIDGET_CreateCSV_Sphere_CSVfilename.description = 'CSVfilename'
-	WIDGET_CreateCSV_Sphere_CSVfilename.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_CSVfilename,)
-	global WIDGET_CreateCSV_Sphere_fixedDatetimeString
-	WIDGET_CreateCSV_Sphere_fixedDatetimeString = widgets.Text(value="Mar 17 2015 00:50:00.000000000")
-	WIDGET_CreateCSV_Sphere_fixedDatetimeString.description = 'fixedDatetimeString'
-	WIDGET_CreateCSV_Sphere_fixedDatetimeString.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedDatetimeString,)
-	global WIDGET_CreateCSV_Sphere_fixedAltitude
-	WIDGET_CreateCSV_Sphere_fixedAltitude = widgets.FloatText(value=120)
-	WIDGET_CreateCSV_Sphere_fixedAltitude.description = 'fixedAltitude'
-	WIDGET_CreateCSV_Sphere_fixedAltitude.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedAltitude,)
-	global WIDGET_CreateCSV_Sphere_LatitudeStep
-	WIDGET_CreateCSV_Sphere_LatitudeStep = widgets.FloatText(value=5)
-	WIDGET_CreateCSV_Sphere_LatitudeStep.description = 'LatitudeStep'
-	WIDGET_CreateCSV_Sphere_LatitudeStep.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LatitudeStep,)
-	global WIDGET_CreateCSV_Sphere_LongitudeStep
-	WIDGET_CreateCSV_Sphere_LongitudeStep = widgets.FloatText(value=5)
-	WIDGET_CreateCSV_Sphere_LongitudeStep.description = 'LongitudeStep'
-	WIDGET_CreateCSV_Sphere_LongitudeStep.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LongitudeStep,)
-	IGRF_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	CreateCSV_Sphere_Btn = widgets.Button (
-		description='CreateCSV_Sphere',
-		tooltip="Creates a CSV file with the format [Time, Lat, Lon, Alt]\nTime and Alt are fixed values given as arguments and Lat and Lon are produced for the whole globe accodring to steps specified.\nCSVfilename: string, the csv filename to be written (overwrite mode)\nfixedDatetimeString: string, the date-time fixed text with format as example: Mar 17 2015 00:12:00.000. Fixed value for every csv entry.\nfixedAltitude: float positive, kilometers above earth. Fixed value for every csv entry.\nLatitudeStep: float positive, Latiude values range between 87.5 and -88.5. The step is how Lat should be incremented at each iteration.\nLongitudeStep: float positive, Longitude values range between -180 and 180.  The step is how Lon should be incremented at each iteration.\nRETURNS: the filename it has written (same as the argument)\n         the altitude (same as the argument)\n         the number of lines written",
-	)
-	CreateCSV_Sphere_Btn.layout.min_width = '200px'
-	CreateCSV_Sphere_Btn.style.button_color = 'gold'
-	IGRF_Panel.children += (CreateCSV_Sphere_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_CreateCSV_Sphere_theCSVfilename = widgets.Label(value='  --> theCSVfilename  ')
-	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.border = '1px dashed green'
-	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theCSVfilename,)
-	WIDGET_CreateCSV_Sphere_theAltitude = widgets.Label(value='  --> theAltitude  ')
-	WIDGET_CreateCSV_Sphere_theAltitude.layout.border = '1px dashed green'
-	WIDGET_CreateCSV_Sphere_theAltitude.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_CreateCSV_Sphere_theAltitude.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theAltitude,)
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten = widgets.Label(value='  --> NumberOfLinesWritten  ')
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.border = '1px dashed green'
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_NumberOfLinesWritten,)
-	IGRF_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'IGRF'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	WIDGET_IGRF_CSVfilename_forMeshgrid = widgets.Label(value='  CreateCSV_Sphere.theCSVfilename --> CSVfilename_forMeshgrid  ')
-	WIDGET_IGRF_CSVfilename_forMeshgrid.layout.border = '1px dashed blue'
-	WIDGET_IGRF_CSVfilename_forMeshgrid.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_IGRF_CSVfilename_forMeshgrid,)
-	global WIDGET_IGRF_Variable_forMeshgrid
-	WIDGET_IGRF_Variable_forMeshgrid = widgets.Dropdown( options=['', 'B', 'Bx', 'By', 'Bz'], value='', description='Variable')
-	WIDGET_IGRF_Variable_forMeshgrid.description = 'Variable_forMeshgrid'
-	WIDGET_IGRF_Variable_forMeshgrid.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_IGRF_Variable_forMeshgrid,)
-	IGRF_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	IGRF_Btn = widgets.Button (
-		description='IGRF',
-		tooltip="International Geomagnetic Reference Field empirical model (IGRF)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the IGRF calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'B'  for magnetic field\n    'Bx' for magnetic field component at x axis\n    'By' for magnetic field component at y axis\n    'Bz' for magnetic field component at z axis\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,B,Bx,By,Bz",
-	)
-	IGRF_Btn.layout.min_width = '200px'
-	IGRF_Btn.style.button_color = 'gold'
-	IGRF_Panel.children += (IGRF_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_IGRF_MeshgridResultCSV = widgets.Label(value='  --> MeshgridResultCSV  ')
-	WIDGET_IGRF_MeshgridResultCSV.layout.border = '1px dashed green'
-	WIDGET_IGRF_MeshgridResultCSV.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_IGRF_MeshgridResultCSV.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_IGRF_MeshgridResultCSV,)
-	IGRF_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'PlotGlobe'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	WIDGET_PlotGlobe_CSVfilename_Meshgrid = widgets.Label(value='  IGRF.MeshgridResultCSV --> CSVfilename_Meshgrid  ')
-	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.border = '1px dashed blue'
-	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Meshgrid,)
-	WIDGET_PlotGlobe_CSVfilename_Orbit = widgets.Label(value='  IGRF.OrbitResultCSV --> CSVfilename_Orbit  ')
-	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.border = '1px dashed blue'
-	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Orbit,)
-	global WIDGET_PlotGlobe_PlotTitle
-	WIDGET_PlotGlobe_PlotTitle = widgets.Text()
-	WIDGET_PlotGlobe_PlotTitle.description = 'PlotTitle'
-	WIDGET_PlotGlobe_PlotTitle.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_PlotGlobe_PlotTitle,)
-	global WIDGET_PlotGlobe_ColorbarTitle
-	WIDGET_PlotGlobe_ColorbarTitle = widgets.Text()
-	WIDGET_PlotGlobe_ColorbarTitle.description = 'ColorbarTitle'
-	WIDGET_PlotGlobe_ColorbarTitle.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_PlotGlobe_ColorbarTitle,)
-	global WIDGET_PlotGlobe_ColorscaleName
-	WIDGET_PlotGlobe_ColorscaleName = widgets.Text(value="Jet")
-	WIDGET_PlotGlobe_ColorscaleName.description = 'ColorscaleName'
-	WIDGET_PlotGlobe_ColorscaleName.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_PlotGlobe_ColorscaleName,)
-	IGRF_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	PlotGlobe_Btn = widgets.Button (
-		description='PlotGlobe',
-		tooltip="Creates a 3D plot of an earth globe, a sphere surface and a satellite orbit. The surface and the orbit are colored according to the data values in the CSV files.\n  DataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the sphere surface. If empty then no surface will be plotted.\n  OrbitDataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the orbit. If empty then no orbit will be plotted.\n  PlotTitle: the title of the plot. It will be displayed at the top of the globe.\n  ColorbarTitle: the title of the colorbar beside the globe. Usually contains measuremnt units\n  ColorscaleName: valid values are: ‘Blackbody’, ‘Bluered’, ‘Blues’, ‘Earth’, ‘Electric’, ‘Greens’, ‘Greys’, ‘Hot’, ‘Jet’, ‘Picnic’, ‘Portland’, ‘Rainbow’, ‘RdBu’, ‘Reds’, ‘Viridis’, ‘YlGnBu’, ‘YlOrRd’\n                  In case an empty string is passed then a default HeatMap colorscale will be applied.\n                  In case None is passed then all points will be black irrespective of value.\n  RETURNS: a string containing information about the Data",
-	)
-	PlotGlobe_Btn.layout.min_width = '200px'
-	PlotGlobe_Btn.style.button_color = 'deeppink'
-	IGRF_Panel.children += (PlotGlobe_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	IGRF_Panel.children += (OutputsPanel,)
-	return IGRF_Panel
-
-
-def Construct_MSISE00():
-	#Create Containers
-	MSISE00_Panel = widgets.Box()
-	MSISE00_Panel.layout.overflow_x = 'scroll'
-	MSISE00_Panel.layout.flex_flow = 'row'
-	MSISE00_Panel.layout.display = 'flex'
-	########
-	## GUI code for module 'OrbitSelector'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	global WIDGET_OrbitSelector_Filename
-	WIDGET_OrbitSelector_Filename = widgets.Text()
-	WIDGET_OrbitSelector_Filename.description = 'Filename'
-	WIDGET_OrbitSelector_Filename.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_Filename,)
-	global WIDGET_OrbitSelector_EvtXY
-	WIDGET_OrbitSelector_EvtXY = widgets.Dropdown( options=['', 'Evt0', 'Evt1', 'Evt2', 'Evt3', 'Evt4', 'Evt5', 'Evt6', 'Evt7', 'Evt8', 'Evt9'], description='Variable')
-	WIDGET_OrbitSelector_EvtXY.description = 'EvtXY'
-	WIDGET_OrbitSelector_EvtXY.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_EvtXY,)
-	global WIDGET_OrbitSelector_TYP
-	WIDGET_OrbitSelector_TYP = widgets.Dropdown( options=['LLA', 'VEL', 'PTG'], description='Variable')
-	WIDGET_OrbitSelector_TYP.description = 'TYP'
-	WIDGET_OrbitSelector_TYP.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_TYP,)
-	global WIDGET_OrbitSelector_PerYYY
-	WIDGET_OrbitSelector_PerYYY = widgets.Dropdown( options=['Per120', 'Per150'], description='Variable')
-	WIDGET_OrbitSelector_PerYYY.description = 'PerYYY'
-	WIDGET_OrbitSelector_PerYYY.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_PerYYY,)
-	global WIDGET_OrbitSelector_LatZZ
-	WIDGET_OrbitSelector_LatZZ = widgets.Dropdown( options=['Lat00', 'Lat40', 'Lat80'],  description='Variable')
-	WIDGET_OrbitSelector_LatZZ.description = 'LatZZ'
-	WIDGET_OrbitSelector_LatZZ.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_LatZZ,)
-	global WIDGET_OrbitSelector_SRXXHZ
-	WIDGET_OrbitSelector_SRXXHZ = widgets.Dropdown( options=['Srt16Hz', 'Srt01Hz'],  description='Variable')
-	WIDGET_OrbitSelector_SRXXHZ.description = 'SRXXHZ'
-	WIDGET_OrbitSelector_SRXXHZ.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_SRXXHZ,)
-	global WIDGET_OrbitSelector_SC
-	WIDGET_OrbitSelector_SC = widgets.Dropdown( options=['Msc', 'Ssc'],  description='Variable')
-	WIDGET_OrbitSelector_SC.description = 'SC'
-	WIDGET_OrbitSelector_SC.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_OrbitSelector_SC,)
-	MSISE00_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	OrbitSelector_Btn = widgets.Button (
-		description='OrbitSelector',
-		tooltip="Constructs and returns an orbit full-path filename from the orbit properties.\nThe filename includes all parameters required to select the appropriate orbit.\nAll filenames  have the same length and same number of parameters. \nIn case OrbitFilename and EvtXY are empty then an empty string is returned.\nFILE FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv\n  Parameter OrbitFilename:\n    If it is not empty then the rest arguments are ignored. \n    If it contains slashes then is is assumed it is a full path name and it is returned as it is.\n    If it does not contain slashes then the orbits path is added.\n    \n  Parameter EvtXY values:\n    EVTXS    X Event, Single Orbit\n    EVTXA    X Event, All Orbit\n    EVT1Y    1st Event: St Patrick’s day event [17 Mar 2015 – 20 Mar 2015]\n    EVT2Y    2nd Event ...  ...\n \n  Parameter TYP values:\n    LLA    Time,Latitude Longitude Altitude \n    VEL    Time,VmagVxVyVz\n    PTG    Time, X_GSE, Y_GSE, Z_GSE, RamX_GSE, RamY_GSE, RamZ_GSE\n  Parameter PerYYY values:\n    PER120, PER150    Perigee Altitude at 120km or 150km\n  Parameter LatZZ values:\n    LAT00, LAT40, LAT80    Perigee Latitude at 0°, 40° or 80°\n \n  Parameter SRXXHZ values:\n    SRT16Hz, SRT01Hz    Sampling rate 16Hz or 1HZ\n \n  Parameter SC values:\n    MSC    Mother Spacecraft\n    SSC    Sub-Spacecraft\n",
-	)
-	OrbitSelector_Btn.layout.min_width = '200px'
-	OrbitSelector_Btn.style.button_color = 'YellowGreen'
-	MSISE00_Panel.children += (OrbitSelector_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_OrbitSelector_OrbitFilename = widgets.Label(value='  --> OrbitFilename  ')
-	WIDGET_OrbitSelector_OrbitFilename.layout.border = '1px dashed green'
-	WIDGET_OrbitSelector_OrbitFilename.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_OrbitSelector_OrbitFilename.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitFilename,)
-	MSISE00_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'MSISE00'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	WIDGET_MSISE00_CSVfilename_forOrbit = widgets.Label(value='  OrbitSelector.OrbitFilename --> CSVfilename_forOrbit  ')
-	WIDGET_MSISE00_CSVfilename_forOrbit.layout.border = '1px dashed blue'
-	WIDGET_MSISE00_CSVfilename_forOrbit.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_MSISE00_CSVfilename_forOrbit,)
-	global WIDGET_MSISE00_Variable_forOrbit
-	WIDGET_MSISE00_Variable_forOrbit = widgets.Dropdown( options=['', 'Tn', 'O','O2','N2', 'rho'], value='', description='Variable')
-	WIDGET_MSISE00_Variable_forOrbit.description = 'Variable_forOrbit'
-	WIDGET_MSISE00_Variable_forOrbit.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_MSISE00_Variable_forOrbit,)
-	MSISE00_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	MSISE00_Btn = widgets.Button (
-		description='MSISE00',
-		tooltip="MSISE-90 (Mass Spectrometer - Incoherent Scatter) empirical model (MSISE)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the MSISE calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'Tn'  for Neutral Temperature\n    'O' for Oxygen atoms\n    'O2' for Oxygen molecules\n    'N2' for Nitrogen molecules\n    'rho' for Mass Densities\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,Tn,O,O2,N2,rho",
-	)
-	MSISE00_Btn.layout.min_width = '200px'
-	MSISE00_Btn.style.button_color = 'gold'
-	MSISE00_Panel.children += (MSISE00_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_MSISE00_ObitResultCSV = widgets.Label(value='  --> ObitResultCSV  ')
-	WIDGET_MSISE00_ObitResultCSV.layout.border = '1px dashed green'
-	WIDGET_MSISE00_ObitResultCSV.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_MSISE00_ObitResultCSV.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_MSISE00_ObitResultCSV,)
-	MSISE00_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'CreateCSV_Sphere'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	global WIDGET_CreateCSV_Sphere_CSVfilename
-	WIDGET_CreateCSV_Sphere_CSVfilename = widgets.Text(value="")
-	WIDGET_CreateCSV_Sphere_CSVfilename.description = 'CSVfilename'
-	WIDGET_CreateCSV_Sphere_CSVfilename.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_CSVfilename,)
-	global WIDGET_CreateCSV_Sphere_fixedDatetimeString
-	WIDGET_CreateCSV_Sphere_fixedDatetimeString = widgets.Text(value="Mar 17 2015 00:50:00.000000000")
-	WIDGET_CreateCSV_Sphere_fixedDatetimeString.description = 'fixedDatetimeString'
-	WIDGET_CreateCSV_Sphere_fixedDatetimeString.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedDatetimeString,)
-	global WIDGET_CreateCSV_Sphere_fixedAltitude
-	WIDGET_CreateCSV_Sphere_fixedAltitude = widgets.FloatText(value=120)
-	WIDGET_CreateCSV_Sphere_fixedAltitude.description = 'fixedAltitude'
-	WIDGET_CreateCSV_Sphere_fixedAltitude.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedAltitude,)
-	global WIDGET_CreateCSV_Sphere_LatitudeStep
-	WIDGET_CreateCSV_Sphere_LatitudeStep = widgets.FloatText(value=5)
-	WIDGET_CreateCSV_Sphere_LatitudeStep.description = 'LatitudeStep'
-	WIDGET_CreateCSV_Sphere_LatitudeStep.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LatitudeStep,)
-	global WIDGET_CreateCSV_Sphere_LongitudeStep
-	WIDGET_CreateCSV_Sphere_LongitudeStep = widgets.FloatText(value=5)
-	WIDGET_CreateCSV_Sphere_LongitudeStep.description = 'LongitudeStep'
-	WIDGET_CreateCSV_Sphere_LongitudeStep.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LongitudeStep,)
-	MSISE00_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	CreateCSV_Sphere_Btn = widgets.Button (
-		description='CreateCSV_Sphere',
-		tooltip="Creates a CSV file with the format [Time, Lat, Lon, Alt]\nTime and Alt are fixed values given as arguments and Lat and Lon are produced for the whole globe accodring to steps specified.\nCSVfilename: string, the csv filename to be written (overwrite mode)\nfixedDatetimeString: string, the date-time fixed text with format as example: Mar 17 2015 00:12:00.000. Fixed value for every csv entry.\nfixedAltitude: float positive, kilometers above earth. Fixed value for every csv entry.\nLatitudeStep: float positive, Latiude values range between 87.5 and -88.5. The step is how Lat should be incremented at each iteration.\nLongitudeStep: float positive, Longitude values range between -180 and 180.  The step is how Lon should be incremented at each iteration.\nRETURNS: the filename it has written (same as the argument)\n         the altitude (same as the argument)\n         the number of lines written",
-	)
-	CreateCSV_Sphere_Btn.layout.min_width = '200px'
-	CreateCSV_Sphere_Btn.style.button_color = 'gold'
-	MSISE00_Panel.children += (CreateCSV_Sphere_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_CreateCSV_Sphere_theCSVfilename = widgets.Label(value='  --> theCSVfilename  ')
-	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.border = '1px dashed green'
-	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theCSVfilename,)
-	WIDGET_CreateCSV_Sphere_theAltitude = widgets.Label(value='  --> theAltitude  ')
-	WIDGET_CreateCSV_Sphere_theAltitude.layout.border = '1px dashed green'
-	WIDGET_CreateCSV_Sphere_theAltitude.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_CreateCSV_Sphere_theAltitude.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theAltitude,)
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten = widgets.Label(value='  --> NumberOfLinesWritten  ')
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.border = '1px dashed green'
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_NumberOfLinesWritten,)
-	MSISE00_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'MSISE00'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	WIDGET_MSISE00_CSVfilename_forMeshgrid = widgets.Label(value='  CreateCSV_Sphere.theCSVfilename --> CSVfilename_forMeshgrid  ')
-	WIDGET_MSISE00_CSVfilename_forMeshgrid.layout.border = '1px dashed blue'
-	WIDGET_MSISE00_CSVfilename_forMeshgrid.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_MSISE00_CSVfilename_forMeshgrid,)
-	global WIDGET_MSISE00_Variable_forMeshgrid
-	WIDGET_MSISE00_Variable_forMeshgrid = widgets.Dropdown( options=['', 'Tn', 'O','O2','N2', 'rho'], value='', description='Variable')
-	WIDGET_MSISE00_Variable_forMeshgrid.description = 'Variable_forMeshgrid'
-	WIDGET_MSISE00_Variable_forMeshgrid.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_MSISE00_Variable_forMeshgrid,)
-	MSISE00_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	MSISE00_Btn = widgets.Button (
-		description='MSISE00',
-		tooltip="MSISE-90 (Mass Spectrometer - Incoherent Scatter) empirical model (MSISE)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the MSISE calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'Tn'  for Neutral Temperature\n    'O' for Oxygen atoms\n    'O2' for Oxygen molecules\n    'N2' for Nitrogen molecules\n    'rho' for Mass Densities\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,Tn,O,O2,N2,rho",
-	)
-	MSISE00_Btn.layout.min_width = '200px'
-	MSISE00_Btn.style.button_color = 'gold'
-	MSISE00_Panel.children += (MSISE00_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	WIDGET_MSISE00_MeshgridResultCSV = widgets.Label(value='  --> MeshgridResultCSV  ')
-	WIDGET_MSISE00_MeshgridResultCSV.layout.border = '1px dashed green'
-	WIDGET_MSISE00_MeshgridResultCSV.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_MSISE00_MeshgridResultCSV.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_MSISE00_MeshgridResultCSV,)
-	MSISE00_Panel.children += (OutputsPanel,)
-	########
-	## GUI code for module 'PlotGlobe'
-	########
-	# Create widgets for module's inputs
-	InputsPanel = widgets.VBox()
-	InputsPanel.layout.min_width = '330px'
-	WIDGET_PlotGlobe_CSVfilename_Meshgrid = widgets.Label(value='  MSISE00.MeshgridResultCSV --> CSVfilename_Meshgrid  ')
-	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.border = '1px dashed blue'
-	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Meshgrid,)
-	WIDGET_PlotGlobe_CSVfilename_Orbit = widgets.Label(value='  MSISE00.ObitResultCSV --> CSVfilename_Orbit  ')
-	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.border = '1px dashed blue'
-	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Orbit,)
-	global WIDGET_PlotGlobe_PlotTitle
-	WIDGET_PlotGlobe_PlotTitle = widgets.Text()
-	WIDGET_PlotGlobe_PlotTitle.description = 'PlotTitle'
-	WIDGET_PlotGlobe_PlotTitle.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_PlotGlobe_PlotTitle,)
-	global WIDGET_PlotGlobe_ColorbarTitle
-	WIDGET_PlotGlobe_ColorbarTitle = widgets.Text()
-	WIDGET_PlotGlobe_ColorbarTitle.description = 'ColorbarTitle'
-	WIDGET_PlotGlobe_ColorbarTitle.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_PlotGlobe_ColorbarTitle,)
-	global WIDGET_PlotGlobe_ColorscaleName
-	WIDGET_PlotGlobe_ColorscaleName = widgets.Text(value="Jet")
-	WIDGET_PlotGlobe_ColorscaleName.description = 'ColorscaleName'
-	WIDGET_PlotGlobe_ColorscaleName.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_PlotGlobe_ColorscaleName,)
-	MSISE00_Panel.children += (InputsPanel,)
-	# Create widget for the moudle black-box body
-	PlotGlobe_Btn = widgets.Button (
-		description='PlotGlobe',
-		tooltip="Creates a 3D plot of an earth globe, a sphere surface and a satellite orbit. The surface and the orbit are colored according to the data values in the CSV files.\n  DataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the sphere surface. If empty then no surface will be plotted.\n  OrbitDataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the orbit. If empty then no orbit will be plotted.\n  PlotTitle: the title of the plot. It will be displayed at the top of the globe.\n  ColorbarTitle: the title of the colorbar beside the globe. Usually contains measuremnt units\n  ColorscaleName: valid values are: ‘Blackbody’, ‘Bluered’, ‘Blues’, ‘Earth’, ‘Electric’, ‘Greens’, ‘Greys’, ‘Hot’, ‘Jet’, ‘Picnic’, ‘Portland’, ‘Rainbow’, ‘RdBu’, ‘Reds’, ‘Viridis’, ‘YlGnBu’, ‘YlOrRd’\n                  In case an empty string is passed then a default HeatMap colorscale will be applied.\n                  In case None is passed then all points will be black irrespective of value.\n  RETURNS: a string containing information about the Data",
-	)
-	PlotGlobe_Btn.layout.min_width = '200px'
-	PlotGlobe_Btn.style.button_color = 'deeppink'
-	MSISE00_Panel.children += (PlotGlobe_Btn,)
-	# Create widgets for module's outputs
-	OutputsPanel = widgets.VBox()
-	OutputsPanel.layout.min_width = '300px'
-	MSISE00_Panel.children += (OutputsPanel,)
-	return MSISE00_Panel
 
 
 def Construct_HWM14():
@@ -865,6 +395,241 @@ def Construct_HWM14():
 	return HWM14_Panel
 
 
+def Construct_MSISE00():
+	#Create Containers
+	MSISE00_Panel = widgets.Box()
+	MSISE00_Panel.layout.overflow_x = 'scroll'
+	MSISE00_Panel.layout.flex_flow = 'row'
+	MSISE00_Panel.layout.display = 'flex'
+	########
+	## GUI code for module 'OrbitSelector'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	global WIDGET_OrbitSelector_Filename
+	WIDGET_OrbitSelector_Filename = widgets.Text()
+	WIDGET_OrbitSelector_Filename.description = 'Filename'
+	WIDGET_OrbitSelector_Filename.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_Filename,)
+	global WIDGET_OrbitSelector_EvtXY
+	WIDGET_OrbitSelector_EvtXY = widgets.Dropdown( options=['', 'Evt0', 'Evt1', 'Evt2', 'Evt3', 'Evt4', 'Evt5', 'Evt6', 'Evt7', 'Evt8', 'Evt9'], description='Variable')
+	WIDGET_OrbitSelector_EvtXY.description = 'EvtXY'
+	WIDGET_OrbitSelector_EvtXY.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_EvtXY,)
+	global WIDGET_OrbitSelector_TYP
+	WIDGET_OrbitSelector_TYP = widgets.Dropdown( options=['LLA', 'VEL', 'PTG'], description='Variable')
+	WIDGET_OrbitSelector_TYP.description = 'TYP'
+	WIDGET_OrbitSelector_TYP.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_TYP,)
+	global WIDGET_OrbitSelector_PerYYY
+	WIDGET_OrbitSelector_PerYYY = widgets.Dropdown( options=['Per120', 'Per150'], description='Variable')
+	WIDGET_OrbitSelector_PerYYY.description = 'PerYYY'
+	WIDGET_OrbitSelector_PerYYY.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_PerYYY,)
+	global WIDGET_OrbitSelector_LatZZ
+	WIDGET_OrbitSelector_LatZZ = widgets.Dropdown( options=['Lat00', 'Lat40', 'Lat80'],  description='Variable')
+	WIDGET_OrbitSelector_LatZZ.description = 'LatZZ'
+	WIDGET_OrbitSelector_LatZZ.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_LatZZ,)
+	global WIDGET_OrbitSelector_SRXXHZ
+	WIDGET_OrbitSelector_SRXXHZ = widgets.Dropdown( options=['Srt16Hz', 'Srt01Hz'],  description='Variable')
+	WIDGET_OrbitSelector_SRXXHZ.description = 'SRXXHZ'
+	WIDGET_OrbitSelector_SRXXHZ.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_SRXXHZ,)
+	global WIDGET_OrbitSelector_SC
+	WIDGET_OrbitSelector_SC = widgets.Dropdown( options=['Msc', 'Ssc'],  description='Variable')
+	WIDGET_OrbitSelector_SC.description = 'SC'
+	WIDGET_OrbitSelector_SC.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_SC,)
+	MSISE00_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	OrbitSelector_Btn = widgets.Button (
+		description='OrbitSelector',
+		tooltip="Constructs and returns an orbit full-path filename from the orbit properties.\nThe filename includes all parameters required to select the appropriate orbit.\nAll filenames  have the same length and same number of parameters. \nIn case OrbitFilename and EvtXY are empty then an empty string is returned.\nFILE FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv\n  Parameter OrbitFilename:\n    If it is not empty then the rest arguments are ignored. \n    If it contains slashes then is is assumed it is a full path name and it is returned as it is.\n    If it does not contain slashes then the orbits path is added.\n    \n  Parameter EvtXY values:\n    EVTXS    X Event, Single Orbit\n    EVTXA    X Event, All Orbit\n    EVT1Y    1st Event: St Patrick’s day event [17 Mar 2015 – 20 Mar 2015]\n    EVT2Y    2nd Event ...  ...\n \n  Parameter TYP values:\n    LLA    Time,Latitude Longitude Altitude \n    VEL    Time,VmagVxVyVz\n    PTG    Time, X_GSE, Y_GSE, Z_GSE, RamX_GSE, RamY_GSE, RamZ_GSE\n  Parameter PerYYY values:\n    PER120, PER150    Perigee Altitude at 120km or 150km\n  Parameter LatZZ values:\n    LAT00, LAT40, LAT80    Perigee Latitude at 0°, 40° or 80°\n \n  Parameter SRXXHZ values:\n    SRT16Hz, SRT01Hz    Sampling rate 16Hz or 1HZ\n \n  Parameter SC values:\n    MSC    Mother Spacecraft\n    SSC    Sub-Spacecraft\n",
+	)
+	OrbitSelector_Btn.layout.min_width = '200px'
+	OrbitSelector_Btn.style.button_color = 'YellowGreen'
+	MSISE00_Panel.children += (OrbitSelector_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_OrbitSelector_OrbitFilename = widgets.Label(value='  --> OrbitFilename  ')
+	WIDGET_OrbitSelector_OrbitFilename.layout.border = '1px dashed green'
+	WIDGET_OrbitSelector_OrbitFilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_OrbitSelector_OrbitFilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitFilename,)
+	MSISE00_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'MSISE00'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	WIDGET_MSISE00_CSVfilename_forOrbit = widgets.Label(value='  OrbitSelector.OrbitFilename --> CSVfilename_forOrbit  ')
+	WIDGET_MSISE00_CSVfilename_forOrbit.layout.border = '1px dashed blue'
+	WIDGET_MSISE00_CSVfilename_forOrbit.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_MSISE00_CSVfilename_forOrbit,)
+	global WIDGET_MSISE00_Variable_forOrbit
+	WIDGET_MSISE00_Variable_forOrbit = widgets.Dropdown( options=['', 'Tn', 'O','O2','N2', 'rho'], value='', description='Variable')
+	WIDGET_MSISE00_Variable_forOrbit.description = 'Variable_forOrbit'
+	WIDGET_MSISE00_Variable_forOrbit.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_MSISE00_Variable_forOrbit,)
+	MSISE00_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	MSISE00_Btn = widgets.Button (
+		description='MSISE00',
+		tooltip="MSISE-90 (Mass Spectrometer - Incoherent Scatter) empirical model (MSISE)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the MSISE calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'Tn'  for Neutral Temperature\n    'O' for Oxygen atoms\n    'O2' for Oxygen molecules\n    'N2' for Nitrogen molecules\n    'rho' for Mass Densities\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,Tn,O,O2,N2,rho",
+	)
+	MSISE00_Btn.layout.min_width = '200px'
+	MSISE00_Btn.style.button_color = 'gold'
+	MSISE00_Panel.children += (MSISE00_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_MSISE00_ObitResultCSV = widgets.Label(value='  --> ObitResultCSV  ')
+	WIDGET_MSISE00_ObitResultCSV.layout.border = '1px dashed green'
+	WIDGET_MSISE00_ObitResultCSV.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_MSISE00_ObitResultCSV.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_MSISE00_ObitResultCSV,)
+	MSISE00_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'CreateCSV_Sphere'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	global WIDGET_CreateCSV_Sphere_CSVfilename
+	WIDGET_CreateCSV_Sphere_CSVfilename = widgets.Text(value="")
+	WIDGET_CreateCSV_Sphere_CSVfilename.description = 'CSVfilename'
+	WIDGET_CreateCSV_Sphere_CSVfilename.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_CSVfilename,)
+	global WIDGET_CreateCSV_Sphere_fixedDatetimeString
+	WIDGET_CreateCSV_Sphere_fixedDatetimeString = widgets.Text(value="Mar 17 2015 00:50:00.000000000")
+	WIDGET_CreateCSV_Sphere_fixedDatetimeString.description = 'fixedDatetimeString'
+	WIDGET_CreateCSV_Sphere_fixedDatetimeString.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedDatetimeString,)
+	global WIDGET_CreateCSV_Sphere_fixedAltitude
+	WIDGET_CreateCSV_Sphere_fixedAltitude = widgets.FloatText(value=120)
+	WIDGET_CreateCSV_Sphere_fixedAltitude.description = 'fixedAltitude'
+	WIDGET_CreateCSV_Sphere_fixedAltitude.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedAltitude,)
+	global WIDGET_CreateCSV_Sphere_LatitudeStep
+	WIDGET_CreateCSV_Sphere_LatitudeStep = widgets.FloatText(value=5)
+	WIDGET_CreateCSV_Sphere_LatitudeStep.description = 'LatitudeStep'
+	WIDGET_CreateCSV_Sphere_LatitudeStep.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LatitudeStep,)
+	global WIDGET_CreateCSV_Sphere_LongitudeStep
+	WIDGET_CreateCSV_Sphere_LongitudeStep = widgets.FloatText(value=5)
+	WIDGET_CreateCSV_Sphere_LongitudeStep.description = 'LongitudeStep'
+	WIDGET_CreateCSV_Sphere_LongitudeStep.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LongitudeStep,)
+	MSISE00_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	CreateCSV_Sphere_Btn = widgets.Button (
+		description='CreateCSV_Sphere',
+		tooltip="Creates a CSV file with the format [Time, Lat, Lon, Alt]\nTime and Alt are fixed values given as arguments and Lat and Lon are produced for the whole globe accodring to steps specified.\nCSVfilename: string, the csv filename to be written (overwrite mode)\nfixedDatetimeString: string, the date-time fixed text with format as example: Mar 17 2015 00:12:00.000. Fixed value for every csv entry.\nfixedAltitude: float positive, kilometers above earth. Fixed value for every csv entry.\nLatitudeStep: float positive, Latiude values range between 87.5 and -88.5. The step is how Lat should be incremented at each iteration.\nLongitudeStep: float positive, Longitude values range between -180 and 180.  The step is how Lon should be incremented at each iteration.\nRETURNS: the filename it has written (same as the argument)\n         the altitude (same as the argument)\n         the number of lines written",
+	)
+	CreateCSV_Sphere_Btn.layout.min_width = '200px'
+	CreateCSV_Sphere_Btn.style.button_color = 'gold'
+	MSISE00_Panel.children += (CreateCSV_Sphere_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_CreateCSV_Sphere_theCSVfilename = widgets.Label(value='  --> theCSVfilename  ')
+	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.border = '1px dashed green'
+	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theCSVfilename,)
+	WIDGET_CreateCSV_Sphere_theAltitude = widgets.Label(value='  --> theAltitude  ')
+	WIDGET_CreateCSV_Sphere_theAltitude.layout.border = '1px dashed green'
+	WIDGET_CreateCSV_Sphere_theAltitude.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_CreateCSV_Sphere_theAltitude.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theAltitude,)
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten = widgets.Label(value='  --> NumberOfLinesWritten  ')
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.border = '1px dashed green'
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_NumberOfLinesWritten,)
+	MSISE00_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'MSISE00'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	WIDGET_MSISE00_CSVfilename_forMeshgrid = widgets.Label(value='  CreateCSV_Sphere.theCSVfilename --> CSVfilename_forMeshgrid  ')
+	WIDGET_MSISE00_CSVfilename_forMeshgrid.layout.border = '1px dashed blue'
+	WIDGET_MSISE00_CSVfilename_forMeshgrid.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_MSISE00_CSVfilename_forMeshgrid,)
+	global WIDGET_MSISE00_Variable_forMeshgrid
+	WIDGET_MSISE00_Variable_forMeshgrid = widgets.Dropdown( options=['', 'Tn', 'O','O2','N2', 'rho'], value='', description='Variable')
+	WIDGET_MSISE00_Variable_forMeshgrid.description = 'Variable_forMeshgrid'
+	WIDGET_MSISE00_Variable_forMeshgrid.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_MSISE00_Variable_forMeshgrid,)
+	MSISE00_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	MSISE00_Btn = widgets.Button (
+		description='MSISE00',
+		tooltip="MSISE-90 (Mass Spectrometer - Incoherent Scatter) empirical model (MSISE)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the MSISE calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'Tn'  for Neutral Temperature\n    'O' for Oxygen atoms\n    'O2' for Oxygen molecules\n    'N2' for Nitrogen molecules\n    'rho' for Mass Densities\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,Tn,O,O2,N2,rho",
+	)
+	MSISE00_Btn.layout.min_width = '200px'
+	MSISE00_Btn.style.button_color = 'gold'
+	MSISE00_Panel.children += (MSISE00_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_MSISE00_MeshgridResultCSV = widgets.Label(value='  --> MeshgridResultCSV  ')
+	WIDGET_MSISE00_MeshgridResultCSV.layout.border = '1px dashed green'
+	WIDGET_MSISE00_MeshgridResultCSV.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_MSISE00_MeshgridResultCSV.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_MSISE00_MeshgridResultCSV,)
+	MSISE00_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'PlotGlobe'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	WIDGET_PlotGlobe_CSVfilename_Meshgrid = widgets.Label(value='  MSISE00.MeshgridResultCSV --> CSVfilename_Meshgrid  ')
+	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.border = '1px dashed blue'
+	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Meshgrid,)
+	WIDGET_PlotGlobe_CSVfilename_Orbit = widgets.Label(value='  MSISE00.ObitResultCSV --> CSVfilename_Orbit  ')
+	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.border = '1px dashed blue'
+	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Orbit,)
+	global WIDGET_PlotGlobe_PlotTitle
+	WIDGET_PlotGlobe_PlotTitle = widgets.Text()
+	WIDGET_PlotGlobe_PlotTitle.description = 'PlotTitle'
+	WIDGET_PlotGlobe_PlotTitle.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_PlotGlobe_PlotTitle,)
+	global WIDGET_PlotGlobe_ColorbarTitle
+	WIDGET_PlotGlobe_ColorbarTitle = widgets.Text()
+	WIDGET_PlotGlobe_ColorbarTitle.description = 'ColorbarTitle'
+	WIDGET_PlotGlobe_ColorbarTitle.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_PlotGlobe_ColorbarTitle,)
+	global WIDGET_PlotGlobe_ColorscaleName
+	WIDGET_PlotGlobe_ColorscaleName = widgets.Text(value="Jet")
+	WIDGET_PlotGlobe_ColorscaleName.description = 'ColorscaleName'
+	WIDGET_PlotGlobe_ColorscaleName.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_PlotGlobe_ColorscaleName,)
+	MSISE00_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	PlotGlobe_Btn = widgets.Button (
+		description='PlotGlobe',
+		tooltip="Creates a 3D plot of an earth globe, a sphere surface and a satellite orbit. The surface and the orbit are colored according to the data values in the CSV files.\n  DataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the sphere surface. If empty then no surface will be plotted.\n  OrbitDataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the orbit. If empty then no orbit will be plotted.\n  PlotTitle: the title of the plot. It will be displayed at the top of the globe.\n  ColorbarTitle: the title of the colorbar beside the globe. Usually contains measuremnt units\n  ColorscaleName: valid values are: ‘Blackbody’, ‘Bluered’, ‘Blues’, ‘Earth’, ‘Electric’, ‘Greens’, ‘Greys’, ‘Hot’, ‘Jet’, ‘Picnic’, ‘Portland’, ‘Rainbow’, ‘RdBu’, ‘Reds’, ‘Viridis’, ‘YlGnBu’, ‘YlOrRd’\n                  In case an empty string is passed then a default HeatMap colorscale will be applied.\n                  In case None is passed then all points will be black irrespective of value.\n  RETURNS: a string containing information about the Data",
+	)
+	PlotGlobe_Btn.layout.min_width = '200px'
+	PlotGlobe_Btn.style.button_color = 'deeppink'
+	MSISE00_Panel.children += (PlotGlobe_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	MSISE00_Panel.children += (OutputsPanel,)
+	return MSISE00_Panel
+
+
 def Construct_IRI16():
 	#Create Containers
 	IRI16_Panel = widgets.Box()
@@ -962,22 +727,22 @@ def Construct_IRI16():
 	WIDGET_Selector_MeshgridLongitudeStep.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Selector_MeshgridLongitudeStep,)
 	global WIDGET_Selector_NoiseWx
-	WIDGET_Selector_NoiseWx = widgets.FloatText(value=100)
+	WIDGET_Selector_NoiseWx = widgets.FloatText(value=0)
 	WIDGET_Selector_NoiseWx.description = 'NoiseWx'
 	WIDGET_Selector_NoiseWx.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Selector_NoiseWx,)
 	global WIDGET_Selector_NoiseWy
-	WIDGET_Selector_NoiseWy = widgets.FloatText(value=50)
+	WIDGET_Selector_NoiseWy = widgets.FloatText(value=0)
 	WIDGET_Selector_NoiseWy.description = 'NoiseWy'
 	WIDGET_Selector_NoiseWy.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Selector_NoiseWy,)
 	global WIDGET_Selector_NoiseAx
-	WIDGET_Selector_NoiseAx = widgets.FloatText(value=1000)
+	WIDGET_Selector_NoiseAx = widgets.FloatText(value=0)
 	WIDGET_Selector_NoiseAx.description = 'NoiseAx'
 	WIDGET_Selector_NoiseAx.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Selector_NoiseAx,)
 	global WIDGET_Selector_NoiseAy
-	WIDGET_Selector_NoiseAy = widgets.FloatText(value=1000)
+	WIDGET_Selector_NoiseAy = widgets.FloatText(value=0)
 	WIDGET_Selector_NoiseAy.description = 'NoiseAy'
 	WIDGET_Selector_NoiseAy.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Selector_NoiseAy,)
@@ -1212,7 +977,7 @@ def Construct_IRI16():
 	# Create widget for the moudle black-box body
 	SubGridVariability_Btn = widgets.Button (
 		description='SubGridVariability',
-		tooltip="",
+		tooltip="Inputs\n NoiseAx,NoiseAy: real:: Amplitude of noise Kind (values 0-100)\n NoiseWx,NoiseWy: real:: Wavenumber of noise Kind (values 0-1000)\n Filename: Character:: field to read orbit from\n ValueName: Character:: variable from model data to use and add SGV. Corresponds to CSV Column\nOutputs\n Plots..\nReturns\n a csv filename of format Time, Lat, Lon, Alt, value containing the altered-with-noise values",
 	)
 	SubGridVariability_Btn.layout.min_width = '200px'
 	SubGridVariability_Btn.style.button_color = 'gold'
@@ -1269,5 +1034,240 @@ def Construct_IRI16():
 	OutputsPanel.layout.min_width = '300px'
 	IRI16_Panel.children += (OutputsPanel,)
 	return IRI16_Panel
+
+
+def Construct_IGRF():
+	#Create Containers
+	IGRF_Panel = widgets.Box()
+	IGRF_Panel.layout.overflow_x = 'scroll'
+	IGRF_Panel.layout.flex_flow = 'row'
+	IGRF_Panel.layout.display = 'flex'
+	########
+	## GUI code for module 'OrbitSelector'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	global WIDGET_OrbitSelector_Filename
+	WIDGET_OrbitSelector_Filename = widgets.Text()
+	WIDGET_OrbitSelector_Filename.description = 'Filename'
+	WIDGET_OrbitSelector_Filename.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_Filename,)
+	global WIDGET_OrbitSelector_EvtXY
+	WIDGET_OrbitSelector_EvtXY = widgets.Dropdown( options=['', 'Evt0', 'Evt1', 'Evt2', 'Evt3', 'Evt4', 'Evt5', 'Evt6', 'Evt7', 'Evt8', 'Evt9'], description='Variable')
+	WIDGET_OrbitSelector_EvtXY.description = 'EvtXY'
+	WIDGET_OrbitSelector_EvtXY.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_EvtXY,)
+	global WIDGET_OrbitSelector_TYP
+	WIDGET_OrbitSelector_TYP = widgets.Dropdown( options=['LLA', 'VEL', 'PTG'], description='Variable')
+	WIDGET_OrbitSelector_TYP.description = 'TYP'
+	WIDGET_OrbitSelector_TYP.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_TYP,)
+	global WIDGET_OrbitSelector_PerYYY
+	WIDGET_OrbitSelector_PerYYY = widgets.Dropdown( options=['Per120', 'Per150'], description='Variable')
+	WIDGET_OrbitSelector_PerYYY.description = 'PerYYY'
+	WIDGET_OrbitSelector_PerYYY.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_PerYYY,)
+	global WIDGET_OrbitSelector_LatZZ
+	WIDGET_OrbitSelector_LatZZ = widgets.Dropdown( options=['Lat00', 'Lat40', 'Lat80'],  description='Variable')
+	WIDGET_OrbitSelector_LatZZ.description = 'LatZZ'
+	WIDGET_OrbitSelector_LatZZ.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_LatZZ,)
+	global WIDGET_OrbitSelector_SRXXHZ
+	WIDGET_OrbitSelector_SRXXHZ = widgets.Dropdown( options=['Srt16Hz', 'Srt01Hz'],  description='Variable')
+	WIDGET_OrbitSelector_SRXXHZ.description = 'SRXXHZ'
+	WIDGET_OrbitSelector_SRXXHZ.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_SRXXHZ,)
+	global WIDGET_OrbitSelector_SC
+	WIDGET_OrbitSelector_SC = widgets.Dropdown( options=['Msc', 'Ssc'],  description='Variable')
+	WIDGET_OrbitSelector_SC.description = 'SC'
+	WIDGET_OrbitSelector_SC.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_OrbitSelector_SC,)
+	IGRF_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	OrbitSelector_Btn = widgets.Button (
+		description='OrbitSelector',
+		tooltip="Constructs and returns an orbit full-path filename from the orbit properties.\nThe filename includes all parameters required to select the appropriate orbit.\nAll filenames  have the same length and same number of parameters. \nIn case OrbitFilename and EvtXY are empty then an empty string is returned.\nFILE FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv\n  Parameter OrbitFilename:\n    If it is not empty then the rest arguments are ignored. \n    If it contains slashes then is is assumed it is a full path name and it is returned as it is.\n    If it does not contain slashes then the orbits path is added.\n    \n  Parameter EvtXY values:\n    EVTXS    X Event, Single Orbit\n    EVTXA    X Event, All Orbit\n    EVT1Y    1st Event: St Patrick’s day event [17 Mar 2015 – 20 Mar 2015]\n    EVT2Y    2nd Event ...  ...\n \n  Parameter TYP values:\n    LLA    Time,Latitude Longitude Altitude \n    VEL    Time,VmagVxVyVz\n    PTG    Time, X_GSE, Y_GSE, Z_GSE, RamX_GSE, RamY_GSE, RamZ_GSE\n  Parameter PerYYY values:\n    PER120, PER150    Perigee Altitude at 120km or 150km\n  Parameter LatZZ values:\n    LAT00, LAT40, LAT80    Perigee Latitude at 0°, 40° or 80°\n \n  Parameter SRXXHZ values:\n    SRT16Hz, SRT01Hz    Sampling rate 16Hz or 1HZ\n \n  Parameter SC values:\n    MSC    Mother Spacecraft\n    SSC    Sub-Spacecraft\n",
+	)
+	OrbitSelector_Btn.layout.min_width = '200px'
+	OrbitSelector_Btn.style.button_color = 'YellowGreen'
+	IGRF_Panel.children += (OrbitSelector_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_OrbitSelector_OrbitFilename = widgets.Label(value='  --> OrbitFilename  ')
+	WIDGET_OrbitSelector_OrbitFilename.layout.border = '1px dashed green'
+	WIDGET_OrbitSelector_OrbitFilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_OrbitSelector_OrbitFilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitFilename,)
+	IGRF_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'IGRF'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	WIDGET_IGRF_CSVfilename_forOrbit = widgets.Label(value='  OrbitSelector.OrbitFilename --> CSVfilename_forOrbit  ')
+	WIDGET_IGRF_CSVfilename_forOrbit.layout.border = '1px dashed blue'
+	WIDGET_IGRF_CSVfilename_forOrbit.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_IGRF_CSVfilename_forOrbit,)
+	global WIDGET_IGRF_Variable_forOrbit
+	WIDGET_IGRF_Variable_forOrbit = widgets.Dropdown( options=['', 'B', 'Bx', 'By', 'Bz'], value='', description='Variable')
+	WIDGET_IGRF_Variable_forOrbit.description = 'Variable_forOrbit'
+	WIDGET_IGRF_Variable_forOrbit.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_IGRF_Variable_forOrbit,)
+	IGRF_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	IGRF_Btn = widgets.Button (
+		description='IGRF',
+		tooltip="International Geomagnetic Reference Field empirical model (IGRF)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the IGRF calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'B'  for magnetic field\n    'Bx' for magnetic field component at x axis\n    'By' for magnetic field component at y axis\n    'Bz' for magnetic field component at z axis\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,B,Bx,By,Bz",
+	)
+	IGRF_Btn.layout.min_width = '200px'
+	IGRF_Btn.style.button_color = 'gold'
+	IGRF_Panel.children += (IGRF_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_IGRF_OrbitResultCSV = widgets.Label(value='  --> OrbitResultCSV  ')
+	WIDGET_IGRF_OrbitResultCSV.layout.border = '1px dashed green'
+	WIDGET_IGRF_OrbitResultCSV.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_IGRF_OrbitResultCSV.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_IGRF_OrbitResultCSV,)
+	IGRF_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'CreateCSV_Sphere'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	global WIDGET_CreateCSV_Sphere_CSVfilename
+	WIDGET_CreateCSV_Sphere_CSVfilename = widgets.Text(value="")
+	WIDGET_CreateCSV_Sphere_CSVfilename.description = 'CSVfilename'
+	WIDGET_CreateCSV_Sphere_CSVfilename.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_CSVfilename,)
+	global WIDGET_CreateCSV_Sphere_fixedDatetimeString
+	WIDGET_CreateCSV_Sphere_fixedDatetimeString = widgets.Text(value="Mar 17 2015 00:50:00.000000000")
+	WIDGET_CreateCSV_Sphere_fixedDatetimeString.description = 'fixedDatetimeString'
+	WIDGET_CreateCSV_Sphere_fixedDatetimeString.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedDatetimeString,)
+	global WIDGET_CreateCSV_Sphere_fixedAltitude
+	WIDGET_CreateCSV_Sphere_fixedAltitude = widgets.FloatText(value=120)
+	WIDGET_CreateCSV_Sphere_fixedAltitude.description = 'fixedAltitude'
+	WIDGET_CreateCSV_Sphere_fixedAltitude.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_fixedAltitude,)
+	global WIDGET_CreateCSV_Sphere_LatitudeStep
+	WIDGET_CreateCSV_Sphere_LatitudeStep = widgets.FloatText(value=5)
+	WIDGET_CreateCSV_Sphere_LatitudeStep.description = 'LatitudeStep'
+	WIDGET_CreateCSV_Sphere_LatitudeStep.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LatitudeStep,)
+	global WIDGET_CreateCSV_Sphere_LongitudeStep
+	WIDGET_CreateCSV_Sphere_LongitudeStep = widgets.FloatText(value=5)
+	WIDGET_CreateCSV_Sphere_LongitudeStep.description = 'LongitudeStep'
+	WIDGET_CreateCSV_Sphere_LongitudeStep.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_CreateCSV_Sphere_LongitudeStep,)
+	IGRF_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	CreateCSV_Sphere_Btn = widgets.Button (
+		description='CreateCSV_Sphere',
+		tooltip="Creates a CSV file with the format [Time, Lat, Lon, Alt]\nTime and Alt are fixed values given as arguments and Lat and Lon are produced for the whole globe accodring to steps specified.\nCSVfilename: string, the csv filename to be written (overwrite mode)\nfixedDatetimeString: string, the date-time fixed text with format as example: Mar 17 2015 00:12:00.000. Fixed value for every csv entry.\nfixedAltitude: float positive, kilometers above earth. Fixed value for every csv entry.\nLatitudeStep: float positive, Latiude values range between 87.5 and -88.5. The step is how Lat should be incremented at each iteration.\nLongitudeStep: float positive, Longitude values range between -180 and 180.  The step is how Lon should be incremented at each iteration.\nRETURNS: the filename it has written (same as the argument)\n         the altitude (same as the argument)\n         the number of lines written",
+	)
+	CreateCSV_Sphere_Btn.layout.min_width = '200px'
+	CreateCSV_Sphere_Btn.style.button_color = 'gold'
+	IGRF_Panel.children += (CreateCSV_Sphere_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_CreateCSV_Sphere_theCSVfilename = widgets.Label(value='  --> theCSVfilename  ')
+	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.border = '1px dashed green'
+	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_CreateCSV_Sphere_theCSVfilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theCSVfilename,)
+	WIDGET_CreateCSV_Sphere_theAltitude = widgets.Label(value='  --> theAltitude  ')
+	WIDGET_CreateCSV_Sphere_theAltitude.layout.border = '1px dashed green'
+	WIDGET_CreateCSV_Sphere_theAltitude.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_CreateCSV_Sphere_theAltitude.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_theAltitude,)
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten = widgets.Label(value='  --> NumberOfLinesWritten  ')
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.border = '1px dashed green'
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_CreateCSV_Sphere_NumberOfLinesWritten.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_CreateCSV_Sphere_NumberOfLinesWritten,)
+	IGRF_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'IGRF'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	WIDGET_IGRF_CSVfilename_forMeshgrid = widgets.Label(value='  CreateCSV_Sphere.theCSVfilename --> CSVfilename_forMeshgrid  ')
+	WIDGET_IGRF_CSVfilename_forMeshgrid.layout.border = '1px dashed blue'
+	WIDGET_IGRF_CSVfilename_forMeshgrid.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_IGRF_CSVfilename_forMeshgrid,)
+	global WIDGET_IGRF_Variable_forMeshgrid
+	WIDGET_IGRF_Variable_forMeshgrid = widgets.Dropdown( options=['', 'B', 'Bx', 'By', 'Bz'], value='', description='Variable')
+	WIDGET_IGRF_Variable_forMeshgrid.description = 'Variable_forMeshgrid'
+	WIDGET_IGRF_Variable_forMeshgrid.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_IGRF_Variable_forMeshgrid,)
+	IGRF_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	IGRF_Btn = widgets.Button (
+		description='IGRF',
+		tooltip="International Geomagnetic Reference Field empirical model (IGRF)\nfilename: the CSV file to read. Format: Time,Alt,Lon,Lat. The file defines the coordinates for which the IGRF calculation will take place.\nParameter: selects which values to calculate. Possible values are:\n    ''   for all\n    'B'  for magnetic field\n    'Bx' for magnetic field component at x axis\n    'By' for magnetic field component at y axis\n    'Bz' for magnetic field component at z axis\nReturns: the name of the CSV file which contains the calculated values. Format: Time,Alt,Lon,Lat,B,Bx,By,Bz",
+	)
+	IGRF_Btn.layout.min_width = '200px'
+	IGRF_Btn.style.button_color = 'gold'
+	IGRF_Panel.children += (IGRF_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_IGRF_MeshgridResultCSV = widgets.Label(value='  --> MeshgridResultCSV  ')
+	WIDGET_IGRF_MeshgridResultCSV.layout.border = '1px dashed green'
+	WIDGET_IGRF_MeshgridResultCSV.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_IGRF_MeshgridResultCSV.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_IGRF_MeshgridResultCSV,)
+	IGRF_Panel.children += (OutputsPanel,)
+	########
+	## GUI code for module 'PlotGlobe'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	WIDGET_PlotGlobe_CSVfilename_Meshgrid = widgets.Label(value='  IGRF.MeshgridResultCSV --> CSVfilename_Meshgrid  ')
+	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.border = '1px dashed blue'
+	WIDGET_PlotGlobe_CSVfilename_Meshgrid.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Meshgrid,)
+	WIDGET_PlotGlobe_CSVfilename_Orbit = widgets.Label(value='  IGRF.OrbitResultCSV --> CSVfilename_Orbit  ')
+	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.border = '1px dashed blue'
+	WIDGET_PlotGlobe_CSVfilename_Orbit.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_PlotGlobe_CSVfilename_Orbit,)
+	global WIDGET_PlotGlobe_PlotTitle
+	WIDGET_PlotGlobe_PlotTitle = widgets.Text()
+	WIDGET_PlotGlobe_PlotTitle.description = 'PlotTitle'
+	WIDGET_PlotGlobe_PlotTitle.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_PlotGlobe_PlotTitle,)
+	global WIDGET_PlotGlobe_ColorbarTitle
+	WIDGET_PlotGlobe_ColorbarTitle = widgets.Text()
+	WIDGET_PlotGlobe_ColorbarTitle.description = 'ColorbarTitle'
+	WIDGET_PlotGlobe_ColorbarTitle.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_PlotGlobe_ColorbarTitle,)
+	global WIDGET_PlotGlobe_ColorscaleName
+	WIDGET_PlotGlobe_ColorscaleName = widgets.Text(value="Jet")
+	WIDGET_PlotGlobe_ColorscaleName.description = 'ColorscaleName'
+	WIDGET_PlotGlobe_ColorscaleName.layout.border = '1px dashed blue'
+	InputsPanel.children += (WIDGET_PlotGlobe_ColorscaleName,)
+	IGRF_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	PlotGlobe_Btn = widgets.Button (
+		description='PlotGlobe',
+		tooltip="Creates a 3D plot of an earth globe, a sphere surface and a satellite orbit. The surface and the orbit are colored according to the data values in the CSV files.\n  DataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the sphere surface. If empty then no surface will be plotted.\n  OrbitDataCSVfilename: format: Time,Lat,Lon,Alt,value. Contains the data for the orbit. If empty then no orbit will be plotted.\n  PlotTitle: the title of the plot. It will be displayed at the top of the globe.\n  ColorbarTitle: the title of the colorbar beside the globe. Usually contains measuremnt units\n  ColorscaleName: valid values are: ‘Blackbody’, ‘Bluered’, ‘Blues’, ‘Earth’, ‘Electric’, ‘Greens’, ‘Greys’, ‘Hot’, ‘Jet’, ‘Picnic’, ‘Portland’, ‘Rainbow’, ‘RdBu’, ‘Reds’, ‘Viridis’, ‘YlGnBu’, ‘YlOrRd’\n                  In case an empty string is passed then a default HeatMap colorscale will be applied.\n                  In case None is passed then all points will be black irrespective of value.\n  RETURNS: a string containing information about the Data",
+	)
+	PlotGlobe_Btn.layout.min_width = '200px'
+	PlotGlobe_Btn.style.button_color = 'deeppink'
+	IGRF_Panel.children += (PlotGlobe_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	IGRF_Panel.children +=  (OutputsPanel,)
+	return IGRF_Panel
 
 

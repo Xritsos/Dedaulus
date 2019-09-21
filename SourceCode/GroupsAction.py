@@ -47,26 +47,26 @@ def Execute_Interpolator():
 	Display('')
 """
 Executes these Simulation Modules:
-  OrbitSelector  IGRF  CreateCSV_Sphere  IGRF  PlotGlobe  
+  OrbitSelector  HWM14  CreateCSV_Sphere  HWM14  PlotGlobe  
 """
-def Execute_IGRF():
-	Display('Executing IGRF:')
+def Execute_HWM14():
+	Display('Executing HWM14:')
 	OrbitSelector_OrbitFilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
 	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
 	Display( '          OrbitFilename: ' + str(OrbitSelector_OrbitFilename) )
-	IGRF_OrbitResultCSV = IGRF( OrbitSelector_OrbitFilename, PanelDisplayer.WIDGET_IGRF_Variable_forOrbit.value )
-	Display( '    IGRF( ' , OrbitSelector_OrbitFilename,', ' , PanelDisplayer.WIDGET_IGRF_Variable_forOrbit.value , ' ) results:')
-	Display( '          OrbitResultCSV: ' + str(IGRF_OrbitResultCSV) )
+	HWM14_OrbitResultCSV = HWM14( OrbitSelector_OrbitFilename, PanelDisplayer.WIDGET_HWM14_Variable_forOrbit.value )
+	Display( '    HWM14( ' , OrbitSelector_OrbitFilename,', ' , PanelDisplayer.WIDGET_HWM14_Variable_forOrbit.value , ' ) results:')
+	Display( '          OrbitResultCSV: ' + str(HWM14_OrbitResultCSV) )
 	CreateCSV_Sphere_theCSVfilename, CreateCSV_Sphere_theAltitude, CreateCSV_Sphere_NumberOfLinesWritten = CreateCSV_Sphere( PanelDisplayer.WIDGET_CreateCSV_Sphere_CSVfilename.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedDatetimeString.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedAltitude.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_LatitudeStep.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_LongitudeStep.value )
 	Display( '    CreateCSV_Sphere( ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_CSVfilename.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedDatetimeString.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedAltitude.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_LatitudeStep.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_LongitudeStep.value , ' ) results:')
 	Display( '          theCSVfilename: ' + str(CreateCSV_Sphere_theCSVfilename) )
 	Display( '          theAltitude: ' + str(CreateCSV_Sphere_theAltitude) )
 	Display( '          NumberOfLinesWritten: ' + str(CreateCSV_Sphere_NumberOfLinesWritten) )
-	IGRF_MeshgridResultCSV = IGRF( CreateCSV_Sphere_theCSVfilename, PanelDisplayer.WIDGET_IGRF_Variable_forMeshgrid.value )
-	Display( '    IGRF( ' , CreateCSV_Sphere_theCSVfilename,', ' , PanelDisplayer.WIDGET_IGRF_Variable_forMeshgrid.value , ' ) results:')
-	Display( '          MeshgridResultCSV: ' + str(IGRF_MeshgridResultCSV) )
-	PlotGlobe( IGRF_MeshgridResultCSV, IGRF_OrbitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
-	Display( '    PlotGlobe( ' , IGRF_MeshgridResultCSV,', ' , IGRF_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
+	HWM14_MeshgridResultCSV = HWM14( CreateCSV_Sphere_theCSVfilename, PanelDisplayer.WIDGET_HWM14_Variable_forMeshgrid.value )
+	Display( '    HWM14( ' , CreateCSV_Sphere_theCSVfilename,', ' , PanelDisplayer.WIDGET_HWM14_Variable_forMeshgrid.value , ' ) results:')
+	Display( '          MeshgridResultCSV: ' + str(HWM14_MeshgridResultCSV) )
+	PlotGlobe( HWM14_MeshgridResultCSV, HWM14_OrbitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
+	Display( '    PlotGlobe( ' , HWM14_MeshgridResultCSV,', ' , HWM14_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
 	Display( '          -void-' )
 	Display('')
 """
@@ -91,30 +91,6 @@ def Execute_MSISE00():
 	Display( '          MeshgridResultCSV: ' + str(MSISE00_MeshgridResultCSV) )
 	PlotGlobe( MSISE00_MeshgridResultCSV, MSISE00_ObitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
 	Display( '    PlotGlobe( ' , MSISE00_MeshgridResultCSV,', ' , MSISE00_ObitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
-	Display( '          -void-' )
-	Display('')
-"""
-Executes these Simulation Modules:
-  OrbitSelector  HWM14  CreateCSV_Sphere  HWM14  PlotGlobe  
-"""
-def Execute_HWM14():
-	Display('Executing HWM14:')
-	OrbitSelector_OrbitFilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
-	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
-	Display( '          OrbitFilename: ' + str(OrbitSelector_OrbitFilename) )
-	HWM14_OrbitResultCSV = HWM14( OrbitSelector_OrbitFilename, PanelDisplayer.WIDGET_HWM14_Variable_forOrbit.value )
-	Display( '    HWM14( ' , OrbitSelector_OrbitFilename,', ' , PanelDisplayer.WIDGET_HWM14_Variable_forOrbit.value , ' ) results:')
-	Display( '          OrbitResultCSV: ' + str(HWM14_OrbitResultCSV) )
-	CreateCSV_Sphere_theCSVfilename, CreateCSV_Sphere_theAltitude, CreateCSV_Sphere_NumberOfLinesWritten = CreateCSV_Sphere( PanelDisplayer.WIDGET_CreateCSV_Sphere_CSVfilename.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedDatetimeString.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedAltitude.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_LatitudeStep.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_LongitudeStep.value )
-	Display( '    CreateCSV_Sphere( ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_CSVfilename.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedDatetimeString.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedAltitude.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_LatitudeStep.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_LongitudeStep.value , ' ) results:')
-	Display( '          theCSVfilename: ' + str(CreateCSV_Sphere_theCSVfilename) )
-	Display( '          theAltitude: ' + str(CreateCSV_Sphere_theAltitude) )
-	Display( '          NumberOfLinesWritten: ' + str(CreateCSV_Sphere_NumberOfLinesWritten) )
-	HWM14_MeshgridResultCSV = HWM14( CreateCSV_Sphere_theCSVfilename, PanelDisplayer.WIDGET_HWM14_Variable_forMeshgrid.value )
-	Display( '    HWM14( ' , CreateCSV_Sphere_theCSVfilename,', ' , PanelDisplayer.WIDGET_HWM14_Variable_forMeshgrid.value , ' ) results:')
-	Display( '          MeshgridResultCSV: ' + str(HWM14_MeshgridResultCSV) )
-	PlotGlobe( HWM14_MeshgridResultCSV, HWM14_OrbitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
-	Display( '    PlotGlobe( ' , HWM14_MeshgridResultCSV,', ' , HWM14_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
 	Display( '          -void-' )
 	Display('')
 """
@@ -155,5 +131,29 @@ def Execute_IRI16():
 	Display( '          VariabilityCSVfilename: ' + str(SubGridVariability_VariabilityCSVfilename) )
 	PlotGlobe( IRI16_MeshgridResultCSV, SubGridVariability_VariabilityCSVfilename, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
 	Display( '    PlotGlobe( ' , IRI16_MeshgridResultCSV,', ' , SubGridVariability_VariabilityCSVfilename,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
+	Display( '          -void-' )
+	Display('')
+"""
+Executes these Simulation Modules:
+  OrbitSelector  IGRF  CreateCSV_Sphere  IGRF  PlotGlobe  
+"""
+def Execute_IGRF():
+	Display('Executing IGRF:')
+	OrbitSelector_OrbitFilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
+	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
+	Display( '          OrbitFilename: ' + str(OrbitSelector_OrbitFilename) )
+	IGRF_OrbitResultCSV = IGRF( OrbitSelector_OrbitFilename, PanelDisplayer.WIDGET_IGRF_Variable_forOrbit.value )
+	Display( '    IGRF( ' , OrbitSelector_OrbitFilename,', ' , PanelDisplayer.WIDGET_IGRF_Variable_forOrbit.value , ' ) results:')
+	Display( '          OrbitResultCSV: ' + str(IGRF_OrbitResultCSV) )
+	CreateCSV_Sphere_theCSVfilename, CreateCSV_Sphere_theAltitude, CreateCSV_Sphere_NumberOfLinesWritten = CreateCSV_Sphere( PanelDisplayer.WIDGET_CreateCSV_Sphere_CSVfilename.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedDatetimeString.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedAltitude.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_LatitudeStep.value, PanelDisplayer.WIDGET_CreateCSV_Sphere_LongitudeStep.value )
+	Display( '    CreateCSV_Sphere( ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_CSVfilename.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedDatetimeString.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_fixedAltitude.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_LatitudeStep.value,', ' , PanelDisplayer.WIDGET_CreateCSV_Sphere_LongitudeStep.value , ' ) results:')
+	Display( '          theCSVfilename: ' + str(CreateCSV_Sphere_theCSVfilename) )
+	Display( '          theAltitude: ' + str(CreateCSV_Sphere_theAltitude) )
+	Display( '          NumberOfLinesWritten: ' + str(CreateCSV_Sphere_NumberOfLinesWritten) )
+	IGRF_MeshgridResultCSV = IGRF( CreateCSV_Sphere_theCSVfilename, PanelDisplayer.WIDGET_IGRF_Variable_forMeshgrid.value )
+	Display( '    IGRF( ' , CreateCSV_Sphere_theCSVfilename,', ' , PanelDisplayer.WIDGET_IGRF_Variable_forMeshgrid.value , ' ) results:')
+	Display( '          MeshgridResultCSV: ' + str(IGRF_MeshgridResultCSV) )
+	PlotGlobe( IGRF_MeshgridResultCSV, IGRF_OrbitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value )
+	Display( '    PlotGlobe( ' ,  IGRF_MeshgridResultCSV,', ' , IGRF_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_ColorscaleName.value , ' ) results:')
 	Display( '          -void-' )
 	Display('')
