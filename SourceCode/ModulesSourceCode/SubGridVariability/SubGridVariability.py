@@ -196,7 +196,7 @@ def SubGridVariability( NoiseWx, NoiseWy, NoiseAx, NoiseAy, filename, ValueName 
 
 
     df = DataFrame(Exports, columns= ['Time (UTCG)', 'Lat (deg)','Lon (deg)','Alt (km)','Variable_SGV'])
-    export_csv = df.to_csv (outfile + '.csv', index = None, header=True)
+  #  export_csv = df.to_csv (outfile + '.csv', index = None, header=True)
 # ******************************************************************************************
 
     return outfile + '.csv'

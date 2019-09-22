@@ -15,6 +15,8 @@ import pandas as pd
 #file to read as input from path given as first argument of function, and parameter could be
 # "Β", "Βx","Βy","Bz", "" to Output 
 def IGRF(file_to_read_full_path, parameter):
+    print(file_to_read_full_path)
+    print(parameter)
     if file_to_read_full_path is None or len(file_to_read_full_path)==0:
         return ""
 
