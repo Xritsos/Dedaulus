@@ -114,24 +114,25 @@ def export_igrf(export_name,parameter):
     #     folderpath = os.path.abspath('ModulesSourceCode/'+'Outputs')
     #check for parameter selection and edit dataframe for export
     #in case of null parameter selection all parameters are exported
-    #at the moment only one parameter of IGRF is exported
+
     if parameter=='B':
-        variable_classes.MSISE00_df.drop(
+        variable_classes.IGRF_df.drop(
         ['Bx_Tesla', 'By_Tesla', 'Bz_Tesla'],
          axis=1,inplace=True)
     if parameter=='Bx':
-        variable_classes.MSISE00_df.drop(
+        variable_classes.IGRF_df.drop(
         ['B_Tesla', 'By_Tesla', 'Bz_Tesla'],
          axis=1,inplace=True)
     if parameter=='By':
-        variable_classes.MSISE00_df.drop(
+        variable_classes.IGRF_df.drop(
         ['Bx_Tesla', 'B_Tesla', 'Bz_Tesla'],
          axis=1,inplace=True)
     if parameter=='Bz':
-        variable_classes.MSISE00_df.drop(
+        variable_classes.IGRF_df.drop(
         ['Bx_Tesla', 'By_Tesla', 'B_Tesla'],
          axis=1,inplace=True)
 
 
     # output_name = folderpath + '/' +export_name
     variable_classes.IGRF_df.to_csv(export_name, index=None)
+    return
