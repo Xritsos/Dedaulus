@@ -84,23 +84,23 @@ def export_msise00(export_name,parameter):
     #in case of null parameter selection all parameters are exported
     if parameter=='Tn':
         variable_classes.MSISE00_df.drop(
-        ['O_msise00', 'O2_msise00_cm-3', 'N2_msise00_cm-3', 'rho_msise00_g*cm-3'],
+        ['O_msise00_cm-3', 'O2_msise00_cm-3', 'N2_msise00_cm-3', 'rho_msise00_g*cm-3'],
          axis=1,inplace=True)
     if parameter=='O':
         variable_classes.MSISE00_df.drop(
-        ['Tn_msise00', 'O2_msise00_cm-3', 'N2_msise00_cm-3', 'rho_msise00_g*cm-3'],
+        ['Tn_msise00_K', 'O2_msise00_cm-3', 'N2_msise00_cm-3', 'rho_msise00_g*cm-3'],
          axis=1,inplace=True)
     if parameter=='O2':
         variable_classes.MSISE00_df.drop(
-        ['Tn_msise00', 'O_msise00_cm-3', 'N2_msise00_cm-3', 'rho_msise00_g*cm-3'],
+        ['Tn_msise00_K', 'O_msise00_cm-3', 'N2_msise00_cm-3', 'rho_msise00_g*cm-3'],
          axis=1,inplace=True)
     if parameter=='N2':
         variable_classes.MSISE00_df.drop(
-        ['Tn_msise00', 'O_msise00_cm-3', 'O2_msise00_cm-3', 'rho_msise00_g*cm-3'],
+        ['Tn_msise00_K', 'O_msise00_cm-3', 'O2_msise00_cm-3', 'rho_msise00_g*cm-3'],
          axis=1,inplace=True)
     if parameter=='rho':
         variable_classes.MSISE00_df.drop(
-        ['Tn_msise00', 'O_msise00_cm-3', 'O2_msise00_cm-3', 'N2_msise00_cm-3'],
+        ['Tn_msise00_K', 'O_msise00_cm-3', 'O2_msise00_cm-3', 'N2_msise00_cm-3'],
          axis=1,inplace=True)
 
     # output_name = folderpath + '/' +export_name
