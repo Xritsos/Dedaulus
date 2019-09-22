@@ -7,10 +7,10 @@
 # using the OpenMP interface for multithreading.Interpolation Method: Trilinear 3D
 # Instructions for FORTRAN subroutines compilation
 
-# Serial_Version
-# No Optimization: "f2py3 -c Interolation_P2P.f95 -m interpolation"
+# Serial_Version(Available)
+# No Optimization: "f2py3 -c Interolation_P2P.f95 -lgomp --opt='-O2' -m interpolation"
 
-# Parallel_Version
+# Parallel_Version (Not Available. Coming Soon...)
 # No Optimization: "f2py3 -c --f90flags="-fopenmp " -lgomp  Interpolation_Parallel_Version.f95 -m interpolation"
 # -O1 Level Optimization: "f2py3 -c --f90flags="-fopenmp " -lgomp --opt='-O1' Interpolation_Parallel_Version.f95 -m interpolation"
 # -O2 Level Optimization: "f2py3 -c --f90flags="-fopenmp " -lgomp --opt='-O2' Interpolation_Parallel_Version.f95 -m interpolation"
@@ -38,8 +38,7 @@
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import pandas as pd
-# import interpolation
-import SourceCode.ModulesSourceCode.Interpolator.interpolation as interpolation
+import interpolation
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
@@ -48,7 +47,7 @@ import os
 
 def Interpolator(model,model_data_file,orbit_file,save,VAR):
 # model-->string:: name of model eg "TIEGCM"
-# model_data_file--> string:: model data files in data folder netCDF file provided from modellers
+# model_data_file--> string:: model data files stored in DaedalusNAS
 # orbit_file-->string :: orbit filename in Time-Lat-Lon-Alt format as porvided in Jupyter
 # save--> Logical:: if true saves interpolated values to directory
 # VAR--> string:: variable to inteprolate, must be  one of the variables included in the model data
@@ -60,15 +59,10 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
     min_alt=120
     max_alt=480
 
-    #*************** Read File + Orbitt and Manipulate Data*********************
-    # TIEGCM=Dataset("../../NAS/TIEGCM_DATA/"+model_data_file)
-    # df = pd.read_csv(orbit_file)
-#     TIEGCM=Dataset("../Data/"+model_data_file)
-#     df = pd.read_csv("../Data/"+orbit_file)
-    TIEGCM=Dataset("../../NAS/TIEGCM_DATA/"+model_data_file)
-#     df = pd.read_csv("../../NAS/Data_Files/OrbitData/"+orbit_file)
-#     TIEGCM=Dataset(/model_data_file)
-    df = pd.read_csv(orbit_file)
+    #*************** Read Model Data and Orit Files**********************
+    TIEGCM=Dataset("../../../NAS/TIEGCM_DATA/"+model_data_file)
+    df = pd.read_csv("../../../NAS/Data_Files/OrbitData/"+orbit_file)
+    #********************************************************************
 
 #   Get Orbit Data from Dataset
     daed_lat_temp = df["Lat_GEOD(deg)"]
@@ -80,7 +74,7 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
     daed_alt=np.zeros((len(daed_alt_temp)))
 
 
-    #Transfrom Lon to Match TIEGCM (-180-180 deg)
+    #Transfrom Lon to Match TIEGCM (-180-180 deg) 
     for i in range (0, len(daed_alt)):
             daed_lon[i]=daed_lon_temp[i]-180
             daed_lat[i]=daed_lat_temp[i]
@@ -96,8 +90,6 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
     grid_time=TIEGCM.variables['time'][:]
     zg=TIEGCM.variables['ZG'][:]
 
-    # for i in range(0,len(grid_lon)):
-    #     print(grid_lon[i],i)
     # Select Variable to Interpolate
     ne=TIEGCM.variables[VAR][:]
 
@@ -133,13 +125,12 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
             # ======================Interpolate Point===========================
             interpolation.interp_p2p(grid_lat,grid_lon,grid_lev,daed_lat[i],daed_lon[i],daed_alt[i],ne,zg,dphi,dtheta,counter,res)
             int_data[i]=res[0]
-            # print(i,daed_lat[i],daed_lon[i],daed_alt[i],res[0])
-#             print(res[0],daed_alt[i])
+
             # ==================================================================
         else:
 
             int_data[i]=None
-            # counter=counter+1
+  
 
         real_time=real_time+orbit_dt
     print("Interpolation Done!")
@@ -147,16 +138,16 @@ def Interpolator(model,model_data_file,orbit_file,save,VAR):
     # **************************************************************************
 
 
-    # ********************Export Data to NAS************************************
+    # ********************Export Data to DaedalusNAS****************************
     if save==True:
-        directory = "../../NAS/Data_Files/ModelsOutput/Interpolation/"
+        directory = "../../../NAS/Data_Files/ModelsOutput/Interpolation/"
 
         Exports={'Time (UTCG)':daed_time,'Lat (deg)':daed_lat,'Lon (deg)':daed_lon,
                         'Alt (km)':daed_alt,'Interpolated_Data':int_data }
 
         df = DataFrame(Exports, columns= ['Time (UTCG)', 'Lat (deg)','Lon (deg)','Alt (km)','Interpolated_Data'])
 
-        export_name="../../NAS/Data_Files/ModelsOutput/Interpolation/"+os.path.splitext(os.path.basename(orbit_file))[0]+"_"+model+ "_"+ VAR+".csv"
+        export_name=directory +os.path.splitext(os.path.basename(orbit_file))[0]+"_"+model+ "_"+ VAR+".csv"
 
         export_csv = df.to_csv (export_name, index = None, header=True)
     # **************************************************************************

@@ -38,18 +38,17 @@
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import pandas as pd
-import interpolation
+import SourceCode.ModulesSourceCode.Interpolator.interpolation as interpolation 
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from datetime import datetime
 import os
 
-def DaedalusInterpolator(model,model_data_file,orbit_file,save,VAR):
-# directory-->string:: output directory
-# model_data_file,model_data_secondary_file--> strings:: model data files in data folder netCDF file provided from modellers
+def Interpolator(model,model_data_file,orbit_file,save,VAR):
+# model-->string:: name of model eg "TIEGCM"
+# model_data_file--> string:: model data files in data folder netCDF file provided from modellers
 # orbit_file-->string :: orbit filename in Time-Lat-Lon-Alt format as porvided in Jupyter
-# max_alt-->float:: max altitude for the interpolation--depends on model and user preference
 # save--> Logical:: if true saves interpolated values to directory
 # VAR--> string:: variable to inteprolate, must be  one of the variables included in the model data
 #Outputs:: Plots+ 1 csv file
@@ -59,12 +58,12 @@ def DaedalusInterpolator(model,model_data_file,orbit_file,save,VAR):
 
     # Interpolation Site Min and Max Altitude Along Track Depending on Model and User Preference
     min_alt=130
-    max_alt=480                            
+    max_alt=470                            
 
     #============== Read File + Orbitt and Manipulate Data=======
     
-    TIEGCM=Dataset("../../../NAS/TIEGCM_DATA/"+model_data_file)
-    df = pd.read_csv("../../../NAS/Data_Files/OrbitData/"+orbit_file+".csv")
+    TIEGCM=Dataset("../../NAS/TIEGCM_DATA/"+model_data_file)
+    df = pd.read_csv(orbit_file)
 
     # =================================================
     
@@ -160,15 +159,20 @@ def DaedalusInterpolator(model,model_data_file,orbit_file,save,VAR):
 
     #Export Data to NAS
     if save==True:
-        directory = "../../../NAS/Data_Files/ModelsOutput/Interpolation/"
+        directory = "../../NAS/Data_Files/ModelsOutput/Interpolation/"
 
         Exports={'Time (UTCG)':daed_time,'Lat (deg)':daed_lat,'Lon (deg)':daed_lon,
                         'Alt (km)':daed_alt,'Interpolated_Data':int_data }
         
         df = DataFrame(Exports, columns= ['Time (UTCG)', 'Lat (deg)','Lon (deg)','Alt (km)','Interpolated_Data'])
 
-        export_csv = df.to_csv (directory+orbit_file+"_" + model+ "_"  +VAR + '.csv', index = None, header=True)
-        print( "Output Saved!","Path-->", directory+orbit_file+"_" + model+ "_"  +VAR + '.csv')
+        
+        
+#     input_path=os.path.dirname(orbit_file)
+        export_name="../../NAS/Data_Files/ModelsOutput/Interpolation/"+os.path.splitext(os.path.basename(orbit_file))[0]+"_"+model+ "_"+ VAR+".csv"
+            
+        export_csv = df.to_csv (export_name, index = None, header=True)
+#       print( "Output Saved!","Path-->", directory+orbit_file+"_" + model+ "_"  +VAR + '.csv')
     # ******************************************************************************
 
 
@@ -197,7 +201,7 @@ def DaedalusInterpolator(model,model_data_file,orbit_file,save,VAR):
     plt.show()
     # ******************************************************************************
 
-    return
+    return(export_name)
 
 
 
