@@ -158,21 +158,21 @@ def PlotGlobe( DataCSVfilename, OrbitDataCSVfilename, PlotTitle, ColorbarTitle, 
     OrbitData =  OrbitDataFile_to_array( OrbitDataCSVfilename ) 
    
     #### Calculate min / max values of all plotable data 
-    if len(Datafilename) > 0:
+    if len(DataCSVfilename) > 0:
         DataMin = np.amin(Data)
         DataMax = np.amax(Data)
     # for the orbit
-    if len(OrbitDatafilename) > 0:
+    if len(OrbitDataCSVfilename) > 0:
         OrbitMin = np.amin( OrbitData[:,3] )
         OrbitMax = np.amax( OrbitData[:,3] )
     # Verdict
-    if len(Datafilename) > 0  and  len(OrbitDatafilename) > 0:
+    if len(DataCSVfilename) > 0  and  len(OrbitDataCSVfilename) > 0:
         GeneralMin = min( DataMin, OrbitMin)
         GeneralMax = max( DataMax, OrbitMax)
-    elif len(Datafilename) > 0:
+    elif len(DataCSVfilename) > 0:
         GeneralMin = DataMin
         GeneralMax = DataMax
-    elif len(OrbitDatafilename) > 0:
+    elif len(OrbitDataCSVfilename) > 0:
         GeneralMin = OrbitMin
         GeneralMax = OrbitMax   
      
@@ -206,7 +206,7 @@ def PlotGlobe( DataCSVfilename, OrbitDataCSVfilename, PlotTitle, ColorbarTitle, 
 ###################################################################################################
 
 #### parse the data file and find the Altitude of the surface described
-def CalculateAltitudeFromData( DataFilename )
+def CalculateAltitudeFromData( DataFilename ):
     if len(DataFilename) == 0:
         result = 0
     elif DataFilename.endswith( ".csv" ):
@@ -223,7 +223,7 @@ def CalculateAltitudeFromData( DataFilename )
 
 #### read the values of the data file into a 2D Array
 def DataFile_to_array( DataFilename ):
-    if len(InputFilename) == 0:
+    if len(DataFilename) == 0:
         DataGrid = None
     elif DataFilename.endswith( ".csv" ):
         ## read the csv file. format: (time lat lon alt value)
