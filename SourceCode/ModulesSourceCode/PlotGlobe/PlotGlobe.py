@@ -15,6 +15,8 @@ We can add these plot types to Plotables:
 
 from numpy import pi, sin, cos
 import time
+from netCDF4 import Dataset  # https://unidata.github.io/netcdf4-python/netCDF4/index.html
+from netCDF4 import MFDataset
 import plotly
 # import plotly.plotly as py
 import chart_studio.plotly as py
@@ -146,40 +148,34 @@ def PlotGlobe( DataCSVfilename, OrbitDataCSVfilename, PlotTitle, ColorbarTitle, 
         )
     )
     
-    #### parse DataCSVfilename and find the Altitude of the surface described by the csv file
-    if len(DataCSVfilename) > 0:
-        CSVreader = csv.reader( open( DataCSVfilename ) )
-        next( CSVreader ) # ignore the csv header
-        Altitude = float(   next( CSVreader )[3]   )
+    #### read the surface Data file and find the Altitude of the surface described by the data file
+    Altitude = CalculateAltitudeFromData( DataCSVfilename )
         
-    #### read DataCSVfilename into a 2D Array
-    if len(DataCSVfilename) > 0:
-        Data =  CSV_to_Datagrid( DataCSVfilename ) 
+    #### read the Data file into an Array
+    Data =  DataFile_to_array( DataCSVfilename ) 
     
+    #### read the Orbit Data file into an Array
+    OrbitData =  OrbitDataFile_to_array( OrbitDataCSVfilename ) 
+   
     #### Calculate min / max values of all plotable data 
-    # for the spere surface around earth
-    # Data = np.array( list(csv.reader(open(  DataCSVfilename  ))), dtype=np.float64)  # make a 2D array out of the rest csv file
-    if len(DataCSVfilename) > 0:
+    if len(Datafilename) > 0:
         DataMin = np.amin(Data)
         DataMax = np.amax(Data)
     # for the orbit
-    if len(OrbitDataCSVfilename) > 0:
-        orbitCSVreader = csv.reader( open( OrbitDataCSVfilename ) )
-        next( orbitCSVreader ) # ignore the csv header
-        OrbitData =  [r[1:5] for r in orbitCSVreader if len(r[4])>0] # read the rest CSV file at once into a 2D list. Ignore first column which is the time and take only the first value in case there are more. Ignore lines without value, as well.
-        OrbitData = np.array( OrbitData, dtype=np.float64 ) # convert to 2D numpy array
+    if len(OrbitDatafilename) > 0:
         OrbitMin = np.amin( OrbitData[:,3] )
         OrbitMax = np.amax( OrbitData[:,3] )
     # Verdict
-    if len(DataCSVfilename) > 0  and  len(OrbitDataCSVfilename) > 0:
+    if len(Datafilename) > 0  and  len(OrbitDatafilename) > 0:
         GeneralMin = min( DataMin, OrbitMin)
         GeneralMax = max( DataMax, OrbitMax)
-    elif len(DataCSVfilename) > 0:
+    elif len(Datafilename) > 0:
         GeneralMin = DataMin
         GeneralMax = DataMax
-    elif len(OrbitDataCSVfilename) > 0:
+    elif len(OrbitDatafilename) > 0:
         GeneralMin = OrbitMin
-        GeneralMax = OrbitMax    
+        GeneralMax = OrbitMax   
+     
 
     # add all visual elements in a list and assign them to a figure
     Plotables = list()
@@ -188,7 +184,7 @@ def PlotGlobe( DataCSVfilename, OrbitDataCSVfilename, PlotTitle, ColorbarTitle, 
     if len(DataCSVfilename) > 0:
         Plotables.append( CreatePlotable_Surface( Data, Altitude, GeneralMin, GeneralMax, colorscale, ColorbarTitle ) )        
     if len(OrbitDataCSVfilename) > 0:
-        Plotables.append( CreatePlotable_Orbit( OrbitDataCSVfilename, GeneralMin, GeneralMax, colorscale, "wwwwwoooo" ) )
+        Plotables.append( CreatePlotable_Orbit( OrbitData, GeneralMin, GeneralMax, colorscale, "wwwwwoooo" ) )
     fig = dict( data=Plotables, layout=theLayout )
     # plot all
     plotly.offline.init_notebook_mode(connected=True)
@@ -209,31 +205,73 @@ def PlotGlobe( DataCSVfilename, OrbitDataCSVfilename, PlotTitle, ColorbarTitle, 
 ###################################################################################################
 ###################################################################################################
 
+#### parse the data file and find the Altitude of the surface described
+def CalculateAltitudeFromData( DataFilename )
+    if len(DataFilename) == 0:
+        result = 0
+    elif DataFilename.endswith( ".csv" ):
+        CSVreader = csv.reader( open( DataFilename ) )
+        next( CSVreader ) # ignore the csv header
+        result = float(   next( CSVreader )[3]   )
+    else:
+        CDFreader = Dataset( DataFilename, 'r' )
+        result = 0
+        CDFreader.close
+    ##
+    return result
 
-def CSV_to_Datagrid( InputFilenameCSV ):    
-    ## read the csv file. format: (time lat lon alt value)
-    CSVreader = csv.reader( open( InputFilenameCSV ) )
-    # ignore the csv header
-    next( CSVreader ) 
-    # read the rest file into a 2D list. Ignore 1st column (time) and take only the first value. Ignore lines without value.
-    RawData =  [r[1:5] for r in CSVreader if len(r[4])>0]
-    # convert to 2D numpy array
-    RawData = np.array( RawData, dtype=np.float64 ) 
+
+#### read the values of the data file into a 2D Array
+def DataFile_to_array( DataFilename ):
+    if len(InputFilename) == 0:
+        DataGrid = None
+    elif DataFilename.endswith( ".csv" ):
+        ## read the csv file. format: (time lat lon alt value)
+        CSVreader = csv.reader( open( DataFilename ) )
+        # ignore the csv header
+        next( CSVreader ) 
+        # read the rest file into a 2D list. Ignore 1st column (time) and take only the first value. Ignore lines without value.
+        RawData =  [r[1:5] for r in CSVreader if len(r[4])>0]
+        # convert to 2D numpy array
+        RawData = np.array( RawData, dtype=np.float64 ) 
     
-    # TODO: Look at the data and find out the step for lat and lon values
-    LatStep  = 5
-    LonStep  = 5
+        # TODO: Look at the data and find out the step for lat and lon values
+        LatStep  = 5
+        LonStep  = 5
     
-    Lat = np.arange(   87.5,  -88.5,  -1*LatStep )
-    Lon = np.arange( -180.0,  180.0,     LonStep )
-    DataGrid = np.zeros( (len(Lat), len(Lon)), dtype=np.float64 )
+        Lat = np.arange(   87.5,  -88.5,  -1*LatStep )
+        Lon = np.arange( -180.0,  180.0,     LonStep )
+        DataGrid = np.zeros( (len(Lat), len(Lon)), dtype=np.float64 )
     
-    for i in range(0, len(Lat)):
-        for j in range(0, len(Lon)):
-            for x in range(0, len(RawData)):
-                if( RawData[x,0] == Lat[i]  and  RawData[x,1] == Lon[j] ):
-                    DataGrid[i, j] = RawData[x, 3]
+        for i in range(0, len(Lat)):
+            for j in range(0, len(Lon)):
+                for x in range(0, len(RawData)):
+                    if( RawData[x,0] == Lat[i]  and  RawData[x,1] == Lon[j] ):
+                        DataGrid[i, j] = RawData[x, 3]
+    else:
+        CDFreader = Dataset( DataFilename, 'r' )
+        DataGrid = None
+        CDFreader.close
+    ##
     return DataGrid
+
+
+
+#### read the values of the orbit data file into a 1D Array
+def OrbitDataFile_to_array( OrbitDataFilename ):
+    if len(OrbitDataFilename) == 0:
+        OrbitData = None
+    elif OrbitDataFilename.endswith( ".csv" ):    
+        orbitCSVreader = csv.reader( open( OrbitDataFilename ) )
+        next( orbitCSVreader ) # ignore the csv header
+        OrbitData =  [r[1:5] for r in orbitCSVreader if len(r[4])>0] # read the rest CSV file at once into a 2D list. Ignore first column which is the time and take only the first value in case there are more. Ignore lines without value, as well.
+        OrbitData = np.array( OrbitData, dtype=np.float64 ) # convert to 1D numpy array
+    else:
+        CDFreader = Dataset( OrbitDataFilename, 'r' )
+        OrbitData = None
+        CDFreader.close
+    ##
+    return OrbitData
 
 ###################################################################################################
 
@@ -287,15 +325,7 @@ def CreatePlotable_Surface( Data, Altitude, GeneralMin, GeneralMax , ColorScale,
 ###########################################################################################################
 
 
-def CreatePlotable_Orbit( OrbitDataCSVfilename, GeneralMin, GeneralMax, ColorScale, ColorbarTitle ):
-    ## read the csv file. format: (time lat lon alt value)
-    orbitCSVreader = csv.reader( open( OrbitDataCSVfilename ) )
-    # ignore the csv header
-    next( orbitCSVreader ) 
-    # read the rest file into a 2D list. Ignore 1st column (time) and take only the first value. Ignore lines without value.
-    OrbitData =  [r[1:5] for r in orbitCSVreader if len(r[4])>0]
-    # convert to numpy array
-    OrbitData = np.array( OrbitData, dtype=np.float64 ) # convert to 2D numpy array
+def CreatePlotable_Orbit( OrbitData, GeneralMin, GeneralMax, ColorScale, ColorbarTitle ):
     
     # process orbit-data in order to plot them in relation with the globe: Convert lat,lon,alt to x,y,z
     for i in range(0, len(OrbitData)): OrbitData[i, 2] = OrbitData[i, 2] + EarthRadius # form radius from earth center using altitude
