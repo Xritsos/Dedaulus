@@ -125,7 +125,7 @@ def FillNETCDF_button_clicked( b ):
                 FillCDF_withCSVdata( CDFroot, CSV_FILES_PATH+orbitname+".csv" ) # fill with data from the csv file
                 CDFroot.close() # close file
                 #### Create the NetCDF template file for the surface as well, so that it's structure is always up-to-date
-                CDFroot =  Dataset( "SourceCode/ModulesSourceCode/CreateNETCDFsphere/SurfaceTemplate.nc", 'w') # open file
+                CDFroot =  Dataset( NETCDF_FILES_PATH + "SurfaceTemplate.nc", 'w') # open file
                 CreateCDFstructure( CDFroot ) # create the structure
                 CDFroot.close() # close file
             except Exception as err:
