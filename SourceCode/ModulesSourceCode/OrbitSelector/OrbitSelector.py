@@ -33,6 +33,9 @@ FILE FORMAT: DAED_ORB_EVTXY_TYP_PERYYY_LATZZ_SRTQQHz_XSC.csv
     MSC    Mother Spacecraft
     SSC    Sub-Spacecraft
 """
+CSV_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the CSV filenames with the orbit data reside.
+NETCDF_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the NetCDF filenames with the orbit data reside.
+
 def OrbitSelector( OrbitFilename, EvtXY, TYP, PerYYY, LatZZ, SRXXHZ, SC ):
     if len(OrbitFilename)==0  and  len(EvtXY)==0 :
         return ""
@@ -40,9 +43,10 @@ def OrbitSelector( OrbitFilename, EvtXY, TYP, PerYYY, LatZZ, SRXXHZ, SC ):
         if "/" in OrbitFilename: 
             return OrbitFilename
         else:
-            return "../../NAS/Data_Files/OrbitData/" + OrbitFilename
+            return "/home/NAS/Data_Files/OrbitData/" + OrbitFilename
     else:
-        f = "../../NAS/Data_Files/OrbitData/" + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC
-        return f+".csv", f+".nc"
+        f_csv = CSV_FILES_PATH    + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
+        f_cdf = NETCDF_FILES_PATH + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".nc"
+        return f_csv, f_cdf
 
 
