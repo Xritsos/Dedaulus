@@ -84,8 +84,12 @@ def get_country_traces():
 ###############
 
 '''
-Creates a 3D plot of an earth globe. Can plot a sphere surface and/or a satellite orbit. The surface and the orbit are colored according to the data values in the data files. Different colorscales can be selected for the surface and the orbit.
+Creates a 3D plot of an earth globe. Can plot a sphere surface and/or a satellite orbit. 
+The surface and the orbit are colored according to the selected variable values in the data files. 
 The data files can be of CSV o NetCDF4 format.
+The same or different variables can be selected for plotting at the surface and the orbit.
+The same or different colorscales can be selected for the surface and the orbit.
+The same or different value range can be selected for the surface and the orbit by assigning the same or different colorbar titles.
 Valid Colorscale Names: ‘Blackbody’, ‘Bluered’, ‘Blues’, ‘Earth’, ‘Electric’, ‘Greens’, ‘Greys’, ‘Hot’, ‘Jet’, ‘Picnic’, ‘Portland’, ‘Rainbow’, ‘RdBu’, ‘Reds’, ‘Viridis’, ‘YlGnBu’, ‘YlOrRd’
 ARGUMENTS:
   SurfaceFilename: The file which contains data for a surface. If empty string then no surface will be plotted. 
