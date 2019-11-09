@@ -49,7 +49,7 @@ def OrbitSelector( OrbitFilename, EvtXY, TYP, PerYYY, LatZZ, SRXXHZ, SC ):
             filename_cdf = OrbitFilename
         else:
             filename_csv = CSV_FILES_PATH + OrbitFilename
-	    filename_cdf = NETCDF_FILES_PATH + OrbitFilename
+            filename_cdf = NETCDF_FILES_PATH + OrbitFilename
     else:
         filename_csv = CSV_FILES_PATH    + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
         filename_cdf = NETCDF_FILES_PATH + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".nc"
