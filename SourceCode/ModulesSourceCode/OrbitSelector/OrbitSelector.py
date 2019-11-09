@@ -37,16 +37,23 @@ CSV_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the CSV
 NETCDF_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the NetCDF filenames with the orbit data reside.
 
 def OrbitSelector( OrbitFilename, EvtXY, TYP, PerYYY, LatZZ, SRXXHZ, SC ):
+    filename_csv = ""
+    filename_cdf = ""
+	
     if len(OrbitFilename)==0  and  len(EvtXY)==0 :
-        return ""
+        filename_csv = ""
+        filename_cdf = ""
     elif len(OrbitFilename) > 0:
         if "/" in OrbitFilename: 
-            return OrbitFilename
+            filename_csv = OrbitFilename
+            filename_cdf = OrbitFilename
         else:
-            return "/home/NAS/Data_Files/OrbitData/" + OrbitFilename
+            filename_csv = CSV_FILES_PATH + OrbitFilename
+	    filename_cdf = NETCDF_FILES_PATH + OrbitFilename
     else:
-        f_csv = CSV_FILES_PATH    + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
-        f_cdf = NETCDF_FILES_PATH + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".nc"
-        return f_csv, f_cdf
+        filename_csv = CSV_FILES_PATH    + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
+        filename_cdf = NETCDF_FILES_PATH + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".nc"
+	
+    return f_csv, f_cdf
 
 
