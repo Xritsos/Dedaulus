@@ -1267,7 +1267,7 @@ def Construct_IGRF():
 	# Create widgets for module's outputs
 	OutputsPanel = widgets.VBox()
 	OutputsPanel.layout.min_width = '300px'
-	IGRF_Panel.children +=  (OutputsPanel,)
+	IGRF_Panel.children  +=  (OutputsPanel,)
 	return IGRF_Panel
 
 

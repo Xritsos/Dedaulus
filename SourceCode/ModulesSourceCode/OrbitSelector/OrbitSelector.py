@@ -1,5 +1,5 @@
 """
-Constructs and returns an orbit full-path filename from the orbit properties.
+Constructs and returns orbit full-path filenames of csv and NetCDF formats from the orbit properties.
 The filename includes all parameters required to select the appropriate orbit.
 All filenames  have the same length and same number of parameters. 
 In case OrbitFilename and EvtXY are empty then an empty string is returned.
@@ -42,6 +42,7 @@ def OrbitSelector( OrbitFilename, EvtXY, TYP, PerYYY, LatZZ, SRXXHZ, SC ):
         else:
             return "../../NAS/Data_Files/OrbitData/" + OrbitFilename
     else:
-        return "../../NAS/Data_Files/OrbitData/" + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC + ".csv"
+        f = "../../NAS/Data_Files/OrbitData/" + "DAED_ORB_" + EvtXY + "_" + TYP + "_" + PerYYY + "_" + LatZZ + "_" + SRXXHZ + "_" + SC
+        return f+".csv", f+".nc"
 
 

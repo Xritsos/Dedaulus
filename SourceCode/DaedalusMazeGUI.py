@@ -4,6 +4,7 @@ It allows the user to select a group of simulation modules and execute it.
 It also displays the results of execution of each module at a text console.
 '''
 
+import SourceCode.DataManagement as DataManagement
 import ipywidgets as widgets
 import SourceCode.PanelDisplayer as PanelDisplayer 
 import SourceCode.GroupsAction as GroupsAction
@@ -38,9 +39,9 @@ AvailableGroupNames = list()
 AvailableGroupNames.append(" ")
 f = open("SourceCode/GroupsAction.py", "r")
 for aLine in f:
-	if aLine.startswith('def Execute_'):
-		aGroupName = aLine[ 12 : aLine.index('(') ]
-		AvailableGroupNames.append( aGroupName )
+    if aLine.startswith('def Execute_'):
+        aGroupName = aLine[ 12 : aLine.index('(') ]
+        AvailableGroupNames.append( aGroupName )
 f.close()
 AvailableGroupNames = list(set(AvailableGroupNames)) # remove duplicates
 AvailableGroupNames.sort()
@@ -53,10 +54,10 @@ It calls the proper function from the automatically fabricated GroupsAction.py f
 This function calls all the simulation module functions of the group.
 '''
 def execute_button_clicked(b):
-	global AvailableGroups_dropdown
-	DisplayBusy()
-	getattr( GroupsAction, 'Execute_'+str(AvailableGroups_dropdown.value) )()
-	DisplayDone()
+    global AvailableGroups_dropdown
+    DisplayBusy()
+    getattr( GroupsAction, 'Execute_'+str(AvailableGroups_dropdown.value) )()
+    DisplayDone()
 
 
 
@@ -67,19 +68,19 @@ It calls the proper function from the automatically fabricated PanelDisplayer.py
 This function displays a visual representation of all simulation modules of a group.
 '''
 def AvailableGroups_dropdown_onChange(change):
-	if change['type']=='change' and change['name']=='value' and ' ' not in change['new']:
-		global CurrentGroupPanel
-		CurrentGroupPanel.close()
-		for child in CurrentGroupPanel.children: child.close()
-		CurrentGroupPanel = getattr( PanelDisplayer, 'Construct_'+str(change['new']) )()
-		# display an image explainig the selected group 
-		groupImgFilename = "SourceCode/AppImages/"+(change['new'])+".png"
-		if os.path.isfile( groupImgFilename ) == True:
-			currentGroupImage = widgets.Image( value=open(groupImgFilename, 'rb').read(), format='png' )
-			currentGroupImage.layout.margin = '0px 0px 15px 0px'
-			ExecutionPanel.children = [ ExecutionPanelHeader, currentGroupImage, CurrentGroupPanel, ConsoleLabel, OutputTextArea ]
-		else:
-			ExecutionPanel.children = [ ExecutionPanelHeader, CurrentGroupPanel, ConsoleLabel, OutputTextArea ]
+    if change['type']=='change' and change['name']=='value' and ' ' not in change['new']:
+        global CurrentGroupPanel
+        CurrentGroupPanel.close()
+        for child in CurrentGroupPanel.children: child.close()
+        CurrentGroupPanel = getattr( PanelDisplayer, 'Construct_'+str(change['new']) )()
+        # display an image explainig the selected group 
+        groupImgFilename = "SourceCode/AppImages/"+(change['new'])+".png"
+        if os.path.isfile( groupImgFilename ) == True:
+            currentGroupImage = widgets.Image( value=open(groupImgFilename, 'rb').read(), format='png' )
+            currentGroupImage.layout.margin = '0px 0px 15px 0px'
+            ExecutionPanel.children = [ ExecutionPanelHeader, currentGroupImage, CurrentGroupPanel, ConsoleLabel, OutputTextArea ]
+        else:
+            ExecutionPanel.children = [ ExecutionPanelHeader, CurrentGroupPanel, ConsoleLabel, OutputTextArea ]
 
 
 
@@ -87,60 +88,67 @@ def AvailableGroups_dropdown_onChange(change):
 Displays a text message at the console
 '''
 def Display( *arg ):
-	msg = ""
-	for item in arg:
-		msg = msg + str(item) + " "
-	OutputTextArea.value = OutputTextArea.value + msg + '\n'
-	
-'''	
+    msg = ""
+    for item in arg:
+        msg = msg + str(item) + " "
+    OutputTextArea.value = OutputTextArea.value + msg + '\n'
+
+'''
 Displays a busy icon next to the execution button
 '''
 def DisplayBusy():
-	global BusyGIF_file
-	global StatusGIF
-	StatusGIF.value = BusyGIF_file
+    global BusyGIF_file
+    global StatusGIF
+    StatusGIF.value = BusyGIF_file
 
-'''	
+'''
 Displays an empty icon next to the execution button
 '''
 def DisplayDone():
-	global BlankGIF_file
-	global StatusGIF
-	StatusGIF.value = BlankGIF_file
+    global BlankGIF_file
+    global StatusGIF
+    StatusGIF.value = BlankGIF_file
 
 
-	
 '''
 This function bundles up all GUI elements and returns the parent of them, so that jupyter can display them.
 '''	
 def createAll():
-	global CurrentGroupPanel 
-	global ExecutionPanelHeader
-	global ExecutionPanel
-	global ConsoleLabel
-	global OutputTextArea 
-	global AvailableGroups_dropdown
-	global BusyGIF_file 
-	global BlankGIF_file
+    global CurrentGroupPanel 
+    global ExecutionPanelHeader
+    global ExecutionPanel
+    global ConsoleLabel
+    global OutputTextArea 
+    global AvailableGroups_dropdown
+    global BusyGIF_file 
+    global BlankGIF_file
 
-	MainTab = widgets.Tab() # all visual elements are children of this one
-	SettingsPanel  = widgets.VBox()
-	AvailableGroups_dropdown = widgets.Dropdown( # here are all module groups for execution
-		description = 'Select Group:',
-		options = AvailableGroupNames
-	)
-	ExecuteButton = widgets.Button(description='Execute', icon='gear', button_style='success')
-	ExecuteButton.on_click(execute_button_clicked)
-	ExecutionPanelHeader.layout.margin ='10px 10px 40px 10px' 
-	ExecutionPanelHeader.children =[AvailableGroups_dropdown, ExecuteButton, StatusGIF]
-	ConsoleLabel.layout.margin ='30px 0px 0px 0px' 
-	OutputTextArea.layout.min_width='920px'
-	OutputTextArea.layout.min_height='500px'
-	OutputTextArea.layout.height='500px'
-	####
-	AvailableGroups_dropdown.observe( AvailableGroups_dropdown_onChange ) # event listener
-	ExecutionPanel.children += ( AvailableGroups_dropdown, )
-	MainTab.children = [ExecutionPanel, SettingsPanel]
-	MainTab.set_title(0, 'Execution')
-	MainTab.set_title(1, 'Settings')
-	return MainTab
+
+    # Create the Containers
+    MainTab = widgets.Tab() # all visual elements are children of this one
+    DataManagementPanel  = widgets.VBox()
+    
+    # Create the Execution Panel
+    AvailableGroups_dropdown = widgets.Dropdown( # here are all module groups for execution
+        description = 'Select Group:',
+        options = AvailableGroupNames
+    )
+    ExecuteButton = widgets.Button(description='Execute', icon='gear', button_style='success')
+    ExecuteButton.on_click(execute_button_clicked)
+    ExecutionPanelHeader.layout.margin ='10px 10px 40px 10px' 
+    ExecutionPanelHeader.children =[AvailableGroups_dropdown, ExecuteButton, StatusGIF]
+    ConsoleLabel.layout.margin ='30px 0px 0px 0px' 
+    OutputTextArea.layout.min_width='920px'
+    OutputTextArea.layout.min_height='500px'
+    OutputTextArea.layout.height='500px'
+    
+    # Create the Data Management panel
+    DataManagementPanel.children = [ DataManagement.ConstructDataManagementPanel() ]
+    
+    # Connect all visual elements and fix the details
+    AvailableGroups_dropdown.observe( AvailableGroups_dropdown_onChange ) # event listener
+    ExecutionPanel.children += ( AvailableGroups_dropdown, )
+    MainTab.children = [ExecutionPanel, DataManagementPanel ]
+    MainTab.set_title(0, 'Execution')
+    MainTab.set_title(1, 'Data Management')
+    return MainTab
