@@ -19,7 +19,7 @@ PROCESSED_FILES_PATH = "/home/NAS/Data_Files/ModelsOutput/" # absolute path wher
 
 AuthPassword = "" # global - Necessary to remember password from the widgets.Password() widget.
 PasswordBox = widgets.Password( ) # global
-
+SpecificFilename = widgets.Text( )  # global
 
 # Constructs the GUI which allows the user manage the NetCDF files.
 def ConstructDataManagementPanel():
@@ -43,8 +43,11 @@ def ConstructDataManagementPanel():
     PasswordLabel = widgets.HTML(value="<b>Type the authorization password:</b>")
     PasswordBox = widgets.Password()
     PasswordBox.observe(PasswordBox_onValueChange, names='value')
-    # for selecting type of file according to the data stored inside it
-    AllStagesLabel = widgets.HTML(value="<b>Select one or several stages of calculation to reset:</b>")
+    # for selecting a specific file by typing its full-path name (in order to reset its state)
+    SpecificFilenameLabel = widgets.HTML(value="<b>Type a specific full-path filename to reset:<b>")
+    SpecificFilenameLabel.layout.margin = '20px 0px 0px 0px'
+    # for selecting type of file according to the data stored inside it (in order to reset its state)
+    AllStagesLabel = widgets.HTML(value="<b>Or select one/several stages of calculation to reset:</b>")
     AllStagesLabel.layout.margin = '20px 0px 0px 0px'
     AllStages = list()
     for f in os.listdir(PROCESSED_FILES_PATH):
@@ -64,7 +67,7 @@ def ConstructDataManagementPanel():
     ResetNETCDFbutton.on_click( ResetNETCDFbutton_clicked )
     
     # Put all together
-    DataManagementPanel.children = [ UsageLabel, SeparatorLabel, PasswordLabel, PasswordBox, AllOrbitsLabel, AllOrbitsSelector, FillNETCDFbutton, SeparatorLabel, AllStagesLabel, AllStagesSelector, ResetNETCDFbutton ]
+    DataManagementPanel.children = [ UsageLabel, SeparatorLabel, PasswordLabel, PasswordBox, AllOrbitsLabel, AllOrbitsSelector, FillNETCDFbutton, SeparatorLabel, SpecificFilenameLabel, SpecificFilename, AllStagesLabel, AllStagesSelector, ResetNETCDFbutton ]
     return DataManagementPanel
     
 # Event listener, handles the "Reset state of NetCDF files" button click
@@ -76,35 +79,46 @@ def ConstructDataManagementPanel():
 def ResetNETCDFbutton_clicked( b ):
     global AuthPassword
     global AllOrbitsSelector
-    if len(AllOrbitsSelector.value) <= 0:
+    global SpecificFilename
+    if len( SpecificFilename.value ) > 0:
+        if os.path.isfile( SpecificFilename.value ):
+            print( "Reseting " + SpecificFilename.value )
+            ResetState_of_NETCDF_file( SpecificFilename.value ) 
+        else:
+            print( "File", SpecificFilename.value, "does not exist." )
+    elif len(AllOrbitsSelector.value) <= 0:
         print( "Please select one or more orbit files." )
     elif len(AllStagesSelector.value) <= 0:
         print( "Please select one or more stages of calculation." )
     elif hashlib.sha224(AuthPassword.encode('utf-8')).hexdigest() == "658716d9784e508836425ed823de4440268f351f68fbf910c3b81696":
+        n = 0
         for orbitname in AllOrbitsSelector.value:
             for stagename in AllStagesSelector.value:
                 try:
-                    ResetState_of_NETCDF_files( orbitname, stagename )
+                    for f in os.listdir(PROCESSED_FILES_PATH + stagename + "/"):
+                        if f.startswith( orbitname ):
+                            fullname = PROCESSED_FILES_PATH + stagename + "/" + orbitName + ".nc"
+                            print( "Reseting " + fullname )
+                            ResetState_of_NETCDF_file( fullname )
+                            n = n + 1
                 except Exception as err:
                     CDFroot.close() # so that the file will not be locked in case of error
                     print("ERROR: ", err)
                     traceback.print_exc()
+        print( n, "files were reseted." ) 
     else:
         print( "Wrong Password.", hashlib.sha224(AuthPassword.encode('utf-8')).hexdigest() )
     
-
     
+         
     
-def ResetState_of_NETCDF_files( orbitName, stageName):
-    filename = PROCESSED_FILES_PATH + stageName + "/" + orbitName + ".nc"
-    if os.path.isfile( filename ):
-        print( "Reseting " + filename )
-        CDFroot =  Dataset( filename, "a") # open file
-        CDFroot.Calculated = "no" # reset state
-        CDFroot.ResetTime = str(datetime.now()) # log 
-        CDFroot.close() # close file
-    else:
-        print( "Does not exist: " + filename )
+# Resets the state of a Daedalus NetCDF file.
+# Arguments:
+def ResetState_of_NETCDF_file( FullpathFilename):
+    CDFroot =  Dataset( FullpathFilename, "a") # open file
+    CDFroot.Calculated = "no" # reset state
+    CDFroot.ResetTime = str(datetime.now()) # log 
+    CDFroot.close() # close file
     
     
     
