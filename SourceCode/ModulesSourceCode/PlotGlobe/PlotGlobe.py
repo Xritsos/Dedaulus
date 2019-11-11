@@ -27,7 +27,7 @@ from mpl_toolkits.basemap import Basemap
 import warnings
 
 EarthRadius = 6378.137 # km - global, its value will not change through out the code
-LatStep  = -5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
+LatStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 LonStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 
 # from plot.ly - convert degrees to radians
@@ -128,7 +128,8 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     # construct the values for longitude and latitude
     global LatStep
     global LonStep
-    LatStep, LonStep = CalculateLatLonSteps( SurfaceFilename )
+    if len(SurfaceFilename) > 0:        
+        LatStep, LonStep = CalculateLatLonSteps( SurfaceFilename )
     lat = np.arange(   87.5,  -88.5, -LatStep )
     lon = np.arange( -180.0,  180.0,  LonStep )
     # To ensure color continuity we extend the lon list with [180] (its last value was lon[-1]=177.5). In this way we can identify lon=-180 with lon=180.
