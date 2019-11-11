@@ -270,7 +270,7 @@ def Interpolator(model_data_file, orbit_file):
     # TODO: if file exists just open it for append and check the Calculated attribute
     orbit_path = orbit_file[ 0 : orbit_file.rfind("/")+1]
     orbit_name = orbit_file[ orbit_file.rfind("/")+1 : -3]
-    result_filename = MODELS_OUTPUT_FOLDER + orbit_name + "Interpolated" + ".nc"
+    result_filename = MODELS_OUTPUT_FOLDER + orbit_name + "_Interpolated" + ".nc"
     copyfile(orbit_file, result_filename)
     
     # Get data from Orbit
