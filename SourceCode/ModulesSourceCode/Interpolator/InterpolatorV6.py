@@ -246,7 +246,7 @@ def Interpolate_Serial(grid_lat,grid_lon,grid_lev,daed_lat,daed_lon,daed_alt,zg,
     return (m)
 
 
-def DaedalusInterpolator(model_data_file,orbit_file,save,VAR,Parallel,F90):
+def DaedalusInterpolator(model_data_file,orbit_file):
 # model data file--> netcdf to read model data from
 # orbit file--> netcdf to read orbit from 
 # save--> Logical:: if true saves interpolated values to directory
@@ -255,7 +255,10 @@ def DaedalusInterpolator(model_data_file,orbit_file,save,VAR,Parallel,F90):
 
 
 
-
+    save=True
+    VAR=["NE","DEN","HE","NO","O1","O2","OP","TN","UI_ExB","VI_ExB","WI_ExB","UN","VN"]
+    Parallel=False
+    F90=False
 
     #***************Read Model Data and Orbit Files*****************************
     # Interpolation Min and Max Altitude Along Track Depending on Model and User Preference
