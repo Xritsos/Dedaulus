@@ -274,12 +274,12 @@ def Construct_Interpolator_NetCDF():
 	InputsPanel = widgets.VBox()
 	InputsPanel.layout.min_width = '330px'
 	global WIDGET_OrbitSelector_Filename
-	WIDGET_OrbitSelector_Filename = widgets.Text("DAED_ORB_Evt0_LLA_Per150_Lat80_Srt01Hz_Msc.nc")
+	WIDGET_OrbitSelector_Filename = widgets.Text("")
 	WIDGET_OrbitSelector_Filename.description = 'Filename'
 	WIDGET_OrbitSelector_Filename.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_OrbitSelector_Filename,)
 	global WIDGET_OrbitSelector_EvtXY
-	WIDGET_OrbitSelector_EvtXY = widgets.Dropdown( options=['Evt0', 'Evt1', 'Evt2', 'Evt3', 'Evt4', 'Evt5', 'Evt6', 'Evt7', 'Evt8', 'Evt9'], description='Variable')
+	WIDGET_OrbitSelector_EvtXY = widgets.Dropdown( options=['', 'Evt0', 'Evt1', 'Evt2', 'Evt3', 'Evt4', 'Evt5', 'Evt6', 'Evt7', 'Evt8', 'Evt9'], value='Evt0', description='Variable')
 	WIDGET_OrbitSelector_EvtXY.description = 'EvtXY'
 	WIDGET_OrbitSelector_EvtXY.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_OrbitSelector_EvtXY,)
@@ -299,7 +299,7 @@ def Construct_Interpolator_NetCDF():
 	WIDGET_OrbitSelector_LatZZ.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_OrbitSelector_LatZZ,)
 	global WIDGET_OrbitSelector_SRXXHZ
-	WIDGET_OrbitSelector_SRXXHZ = widgets.Dropdown( options=['Srt16Hz', 'Srt01Hz'],  description='Variable')
+	WIDGET_OrbitSelector_SRXXHZ = widgets.Dropdown( options=['Srt16Hz', 'Srt01Hz'],  value='Srt01Hz', description='Variable')
 	WIDGET_OrbitSelector_SRXXHZ.description = 'SRXXHZ'
 	WIDGET_OrbitSelector_SRXXHZ.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_OrbitSelector_SRXXHZ,)
@@ -337,13 +337,8 @@ def Construct_Interpolator_NetCDF():
 	# Create widgets for module's inputs
 	InputsPanel = widgets.VBox()
 	InputsPanel.layout.min_width = '330px'
-	global WIDGET_Interpolator_model
-	WIDGET_Interpolator_model = widgets.Text(value="TIEGCM")
-	WIDGET_Interpolator_model.description = 'model'
-	WIDGET_Interpolator_model.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_Interpolator_model,)
 	global WIDGET_Interpolator_model_data_file
-	WIDGET_Interpolator_model_data_file = widgets.Text(value="tiegcm_s_24900.nc")
+	WIDGET_Interpolator_model_data_file = widgets.Text(value="/home/NAS/TIEGCM_DATA/tiegcm_s_24900.nc")
 	WIDGET_Interpolator_model_data_file.description = 'model_data_file'
 	WIDGET_Interpolator_model_data_file.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Interpolator_model_data_file,)
@@ -351,16 +346,6 @@ def Construct_Interpolator_NetCDF():
 	WIDGET_Interpolator_orbit_file.layout.border = '1px dashed blue'
 	WIDGET_Interpolator_orbit_file.layout.padding = '0px 10px 0px 10px'
 	InputsPanel.children += (WIDGET_Interpolator_orbit_file,)
-	global WIDGET_Interpolator_save
-	WIDGET_Interpolator_save = widgets.Checkbox( value=True, description='Save')
-	WIDGET_Interpolator_save.description = 'save'
-	WIDGET_Interpolator_save.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_Interpolator_save,)
-	global WIDGET_Interpolator_VAR
-	WIDGET_Interpolator_VAR = widgets.Text(value="O2")
-	WIDGET_Interpolator_VAR.description = 'VAR'
-	WIDGET_Interpolator_VAR.layout.border = '1px dashed blue'
-	InputsPanel.children += (WIDGET_Interpolator_VAR,)
 	Interpolator_NetCDF_Panel.children += (InputsPanel,)
 	# Create widget for the moudle black-box body
 	Interpolator_Btn = widgets.Button (
@@ -391,7 +376,7 @@ def Construct_Interpolator_NetCDF():
 	WIDGET_PlotGlobe_SurfaceFilename.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_PlotGlobe_SurfaceFilename,)
 	global WIDGET_PlotGlobe_SurfaceVariableToPlot
-	WIDGET_PlotGlobe_SurfaceVariableToPlot = widgets.Text(value='ALFA')
+	WIDGET_PlotGlobe_SurfaceVariableToPlot = widgets.Text(value='NE')
 	WIDGET_PlotGlobe_SurfaceVariableToPlot.description = 'SurfaceVariableToPlot'
 	WIDGET_PlotGlobe_SurfaceVariableToPlot.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_PlotGlobe_SurfaceVariableToPlot,)
@@ -410,7 +395,7 @@ def Construct_Interpolator_NetCDF():
 	WIDGET_PlotGlobe_OrbitFilename.layout.padding = '0px 10px 0px 10px'
 	InputsPanel.children += (WIDGET_PlotGlobe_OrbitFilename,)
 	global WIDGET_PlotGlobe_OrbitVariableToPlot
-	WIDGET_PlotGlobe_OrbitVariableToPlot = widgets.Text(value='ALFA')
+	WIDGET_PlotGlobe_OrbitVariableToPlot = widgets.Text(value='NE')
 	WIDGET_PlotGlobe_OrbitVariableToPlot.description = 'OrbitVariableToPlot'
 	WIDGET_PlotGlobe_OrbitVariableToPlot.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_PlotGlobe_OrbitVariableToPlot,)
