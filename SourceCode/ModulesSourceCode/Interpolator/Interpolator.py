@@ -246,7 +246,7 @@ def Interpolate_Serial(grid_lat,grid_lon,grid_lev,daed_lat,daed_lon,daed_alt,zg,
     return (m)
 
 
-def DaedalusInterpolator(model_data_file,orbit_file):
+def Interpolator(model_data_file, orbit_file):
 # model data file--> netcdf to read model data from
 # orbit file--> netcdf to read orbit from 
 # save--> Logical:: if true saves interpolated values to directory
