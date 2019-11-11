@@ -48,6 +48,8 @@ import time
 import os
 import multiprocessing
 from functools import partial
+from shutil import copyfile
+
 
 
 def local(dim1,y,x):
@@ -237,14 +239,12 @@ def Interpolate_Serial(grid_lat,grid_lon,grid_lev,daed_lat,daed_lon,daed_alt,zg,
 
         m[i]=m[i]*t_w1+m2*t_w2
 
-
-
-
-
-
-
     return (m)
 
+
+
+
+MODELS_OUTPUT_FOLDER = "/home/NAS/Data_Files/ModelsOutput/Interpolation/"
 
 def Interpolator(model_data_file, orbit_file):
 # model data file--> netcdf to read model data from
@@ -266,14 +266,20 @@ def Interpolator(model_data_file, orbit_file):
     max_alt=450      #max altitude to interpolate      
     srt=1            # daedalus sampling rate
 
-    # Get data from Orbit
-    orbit=Dataset(orbit_file,"r")
+    # Copy the orbit file from the OrbitData folder to ModelsOutput folder
+    # TODO: if file exists just open it for append and check the Calculated attribute
+    orbit_path = orbit_file[ 0 : orbit_file.rfind("/")+1]
+    orbit_name = orbit_file[ orbit_file.rfind("/")+1 : -3]
+    result_filename = MODELS_OUTPUT_FOLDER + orbit_name + "Interpolated" + ".nc"
+    copyfile(orbit_file, result_filename)
     
-    daed_lat_temp = orbit.variables['lat'][:]
-    daed_lon_temp = orbit.variables['lon'][:]
-    daed_alt_temp = orbit.variables['level'][:]
-    daed_time_temp = orbit.variables['time'][:]
-    orbit.close()
+    # Get data from Orbit
+    resultCDF=Dataset(orbit_file,"a")
+    
+    daed_lat_temp = resultCDF.variables['lat'][:]
+    daed_lon_temp = resultCDF.variables['lon'][:]
+    daed_alt_temp = resultCDF.variables['level'][:]
+    daed_time_temp = resultCDF.variables['time'][:]
 
     # Get data from Model
     TIEGCM=Dataset(model_data_file)
@@ -371,15 +377,14 @@ def Interpolator(model_data_file, orbit_file):
         # **************************************************************************
 
         if save==True:
-            ncout = Dataset(orbit_file, "a")
-            ncout.variables[VAR[jj]][:]= int_final
-            ncout.close()
+            resultCDF.variables[VAR[jj]][:]= int_final
             # **********************************************************************§
 
     t2=time.time()
+    resultCDF.close()
     print("Interpolation Finished in ",str(t2-t1),"s")
-    # return (orbit_file+"_" +VAR+".csv")
-    return
+    
+    return result_filename
 
 
 
