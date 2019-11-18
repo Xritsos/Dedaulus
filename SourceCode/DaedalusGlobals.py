@@ -13,20 +13,20 @@ NetCDF_Files_Path = "/home/NAS/Data_Files/OrbitData/"
 
 
 # Absolute path where the filenames with calculated values reside.
-Processed_Files_Path = "/home/NAS/Data_Files/ModelsOutput/" 
+Processed_Files_Path = "/home/NAS/Data_Files/ModelOutputs/" 
 
 
 # Absolute path where the filenames with the interpolated values reside.
-Interpolated_Files_Path = "/home/NAS/Data_Files/ModelsOutput/A_Interpolated/" 
+Interpolated_Files_Path = "/home/NAS/Data_Files/ModelOutputs/A_Interpolated/" 
 
 # Absolute path where the filenames with the Synthetic Truth values reside.
 # That is after Sub-Grid Variability is applied on the data.
-SyntheticTruth_Files_Path = "/home/NAS/Data_Files/ModelsOutput/B_SyntheticTruth/" 
+SyntheticTruth_Files_Path = "/home/NAS/Data_Files/ModelOutputs/B_SyntheticTruth/" 
 
 # Absolute path where the filenames with the Stimuli values reside.
 # That is after Wake-Effects and Charging-Effects are applied on the data.
-Stimuli_Files_Path = "/home/NAS/Data_Files/ModelsOutput/C_Stimuli/" 
+Stimuli_Files_Path = "/home/NAS/Data_Files/ModelOutputs/C_Stimuli/" 
 
 # Absolute path where the filenames with the Synthetic Science values reside.
 # That is after the results of the satellite instruments are applied on the data.
-SyntheticScience_Files_Path = "/home/NAS/Data_Files/ModelsOutput/D_SyntheticScience/" 
+SyntheticScience_Files_Path = "/home/NAS/Data_Files/ModelOutputs/D_SyntheticScience/" 
