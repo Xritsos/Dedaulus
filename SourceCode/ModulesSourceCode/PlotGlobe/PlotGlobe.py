@@ -18,8 +18,7 @@ import time
 from netCDF4 import Dataset  # https://unidata.github.io/netcdf4-python/netCDF4/index.html
 from netCDF4 import MFDataset
 import plotly
-# import plotly.plotly as py
-import chart_studio.plotly as py
+import chart_studio.plotly as py # import plotly.plotly as py
 import csv
 import numpy as np           
 from scipy.io import netcdf  
@@ -235,7 +234,7 @@ def CalculateAltitudeFromData( SurfaceFilename ):
     else:
         CDFroot = Dataset( SurfaceFilename, 'r' )
         #result = float( CDFroot.Elevation )
-        result = CDFroot.variables["level"][0]
+        result = CDFroot.variables["altitude"][0]
         if result==0: 
             result = 2
         CDFroot.close()
@@ -332,7 +331,7 @@ def SurfaceFile_to_array( SurfaceFilename, VariableName ):
         CDFroot = Dataset( SurfaceFilename, 'r' )
         if "(unlimited)" in str(CDFroot.dimensions["lat"]): # surface's file format is the same as the orbit's
             # read the NetCDF file into a 2D array with columns lat,lon,elevation,values
-            RawData = np.vstack( (CDFroot.variables["lat"][:], CDFroot.variables["lon"][:], CDFroot.variables["level"][:], CDFroot.variables[VariableName][:] ) ).T
+            RawData = np.vstack( (CDFroot.variables["lat"][:], CDFroot.variables["lon"][:], CDFroot.variables["altitude"][:], CDFroot.variables[VariableName][:] ) ).T
             # Round lat and lon columns to remove small variations which trick Panoply to see different values and plot the surface
             for i in range(0, len(RawData)):
                 RawData[i, 0] = round( RawData[i, 0], 2 )
@@ -369,7 +368,7 @@ def OrbitFile_to_array( OrbitFilename, VariableName ):
         OrbitData = np.array( OrbitData, dtype=np.float64 ) # convert to 1D numpy array
     else:
         CDFroot = Dataset( OrbitFilename, 'r' )
-        OrbitData = np.vstack( (CDFroot.variables["lat"][:], CDFroot.variables["lon"][:], CDFroot.variables["level"][:], CDFroot.variables[VariableName][:] ) ).T
+        OrbitData = np.vstack( (CDFroot.variables["lat"][:], CDFroot.variables["lon"][:], CDFroot.variables["altitude"][:], CDFroot.variables[VariableName][:] ) ).T
         CDFroot.close()
     ##
     return OrbitData

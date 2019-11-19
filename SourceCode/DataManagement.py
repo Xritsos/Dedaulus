@@ -5,6 +5,7 @@ from netCDF4 import Dataset  # https://unidata.github.io/netcdf4-python/netCDF4/
 from netCDF4 import MFDataset
 from netCDF4 import stringtochar
 from datetime import datetime
+import SourceCode.DaedalusGlobals as DaedalusGlobals
 import hashlib
 import ipywidgets as widgets
 import traceback
@@ -12,10 +13,6 @@ import numpy as np
 import csv
 import os
 
-
-CSV_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the CSV filenames with the orbit data reside.
-NETCDF_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the NetCDF filenames with the orbit data reside.
-PROCESSED_FILES_PATH = "/home/NAS/Data_Files/ModelsOutput/" # absolute path where the filenames with calculated values reside.
 
 AuthPassword = "" # global - Necessary to remember password from the widgets.Password() widget.
 PasswordBox = widgets.Password( ) # global
@@ -33,7 +30,7 @@ def ConstructDataManagementPanel():
     AllOrbitsLabel = widgets.HTML(value="<b>Select one or several orbits:</b>")
     AllOrbitsLabel.layout.margin = '20px 0px 0px 0px'
     AllOrbitFilenames = list()
-    for f in os.listdir(CSV_FILES_PATH):
+    for f in os.listdir( DaedalusGlobals.CSV_Files_Path ):
         if f.endswith("csv"):
             AllOrbitFilenames.append( f[:-4] )
     global AllOrbitsSelector
@@ -50,8 +47,8 @@ def ConstructDataManagementPanel():
     AllStagesLabel = widgets.HTML(value="<b>Or select one/several stages of calculation to reset:</b>")
     AllStagesLabel.layout.margin = '20px 0px 0px 0px'
     AllStages = list()
-    for f in os.listdir(PROCESSED_FILES_PATH):
-        if os.path.isdir(PROCESSED_FILES_PATH+f):  
+    for f in os.listdir(DaedalusGlobals.Processed_Files_Path):
+        if os.path.isdir(DaedalusGlobals.Processed_Files_Path+f):  
             AllStages.append( f )
     global AllStagesSelector
     AllStagesSelector = widgets.SelectMultiple( options=AllStages, rows=5, )
@@ -95,9 +92,9 @@ def ResetNETCDFbutton_clicked( b ):
         for orbitname in AllOrbitsSelector.value:
             for stagename in AllStagesSelector.value:
                 try:
-                    for f in os.listdir(PROCESSED_FILES_PATH + stagename + "/"):
+                    for f in os.listdir(DaedalusGlobals.Processed_Files_Path + stagename + "/"):
                         if f.startswith( orbitname ):
-                            fullname = PROCESSED_FILES_PATH + stagename + "/" + orbitName + ".nc"
+                            fullname = DaedalusGlobals.Processed_Files_Path + stagename + "/" + orbitName + ".nc"
                             print( "Reseting " + fullname )
                             ResetState_of_NETCDF_file( fullname )
                             n = n + 1
@@ -133,13 +130,13 @@ def FillNETCDF_button_clicked( b ):
         for orbitname in AllOrbitsSelector.value:
             try: 
                 #### Create the NetCDF for the orbit
-                print( "Creating " + NETCDF_FILES_PATH+orbitname+".nc" )
-                CDFroot =  Dataset( NETCDF_FILES_PATH+orbitname+".nc", 'w') # open file
+                print( "Creating " + DaedalusGlobals.NetCDF_Files_Path+orbitname+".nc" )
+                CDFroot =  Dataset( DaedalusGlobals.NetCDF_Files_Path+orbitname+".nc", 'w') # open file
                 CreateCDFstructure( CDFroot ) # create the structure
-                FillCDF_withCSVdata( CDFroot, CSV_FILES_PATH+orbitname+".csv" ) # fill with data from the csv file
+                FillCDF_withCSVdata( CDFroot, DaedalusGlobals.CSV_Files_Path+orbitname+".csv" ) # fill with data from the csv file
                 CDFroot.close() # close file
                 #### Create the NetCDF template file for the surface as well, so that it's structure is always up-to-date
-                CDFroot =  Dataset( NETCDF_FILES_PATH + "SurfaceTemplate.nc", 'w') # open file
+                CDFroot =  Dataset( DaedalusGlobals.NetCDF_Files_Path + "SurfaceTemplate.nc", 'w') # open file
                 CreateCDFstructure( CDFroot ) # create the structure
                 CDFroot.close() # close file
             except Exception as err:
@@ -196,15 +193,15 @@ def CreateCDFstructure( CDFroot ):
     CDFroot.CreationTime = str(datetime.now())
     CDFroot.ResetTime = str(datetime.now())
     # create dimensions
-    CDFroot.createDimension("level", None)
-    CDFroot.createDimension("time", None)
-    CDFroot.createDimension("lat", None)
-    CDFroot.createDimension("lon", None)
+    CDFroot.createDimension("altitude", None)
+    CDFroot.createDimension("time",     None)
+    CDFroot.createDimension("lat",      None)
+    CDFroot.createDimension("lon",      None)
     # create variables
-    CDFroot.createVariable("time",  "u8", ("time",))
-    CDFroot.createVariable("lat",   "f8", ("time",))
-    CDFroot.createVariable("lon",   "f8", ("time",))
-    CDFroot.createVariable("level", "f8", ("time",))
+    CDFroot.createVariable("time",     "u8", ("time",))
+    CDFroot.createVariable("lat",      "f8", ("time",))
+    CDFroot.createVariable("lon",      "f8", ("time",))
+    CDFroot.createVariable("altitude", "f8", ("time",))
     V = CDFroot.createVariable("ALFA", "f8", ("time",))
     V.description = "Aurora Characteristic Energy"
     V.units = "keV"
@@ -333,7 +330,7 @@ def FillCDF_withCSVdata( CDFroot, CSVfilename ):
     CDFroot.variables["time"][:] = Times
     CDFroot.variables["lat"][:] = Latitudes
     CDFroot.variables["lon"][:] = Longitudes
-    CDFroot.variables["level"][:] = Elevations
+    CDFroot.variables["altitude"][:] = Elevations
     CDFroot.variables["ALFA"][:] = np.random.random( len(Times) ) # assign random values for test purposes
 
 
@@ -344,7 +341,7 @@ with a structure which can be parsed and plotted correctly by Panoply.
 We decided not to use this structure because it would require different methods for acessing data of the NetCDF file,
 depending on wether it would be an orbit or a surface file. 
 Instead we created a separate module Create_NetCDF_surface which creates an orbit-like structured NetCDF and updates
-some of its attributes and variables, like Type and level.
+some of its attributes and variables, like Type and altitude.
 def Create_NetCDF_surface( CDFroot, OrbitTemplate_CDFroot ):
     # create attributes
     CDFroot.Type = "surface"
@@ -365,14 +362,14 @@ def Create_NetCDF_surface( CDFroot, OrbitTemplate_CDFroot ):
     CDFroot.variables["lon"][:] = np.arange( -180,  180, 5)
     # create and fill all the rest variables
     for v in OrbitTemplate_CDFroot.variables:
-        if v!="lat" and v!="lon" and v!="time" and v!="level":
+        if v!="lat" and v!="lon" and v!="time" and v!="altitude":
             CDFroot.createVariable(v,"f4",("lat","lon",))
             CDFroot.variables[v][:, :] = np.random.random((36, 72)) # assign random values for test purposes
             CDFroot.variables[v][9, 21] = 2 # highlight New York for test purposes
 # USAGE:
 #### Create the NetCDF for the surface as well ( a sphere around Earth, with the same structure as the orbit file )
-orbitTemplateCDFroot = Dataset(NETCDF_FILES_PATH+orbitname+".nc", 'r')
-SurfaceCDFroot = Dataset(NETCDF_FILES_PATH+"Surface.nc", 'w')
+orbitTemplateCDFroot = Dataset(DaedalusGlobals.NetCDF_Files_Path+orbitname+".nc", 'r')
+SurfaceCDFroot = Dataset(DaedalusGlobals.NetCDF_Files_Path+"Surface.nc", 'w')
 Create_NetCDF_surface( SurfaceCDFroot, orbitTemplateCDFroot )
 orbitTemplateCDFroot.close()
 SurfaceCDFroot.close()  
