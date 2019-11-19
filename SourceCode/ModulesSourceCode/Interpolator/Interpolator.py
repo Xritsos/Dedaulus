@@ -38,6 +38,7 @@
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import pandas as pd
+import SourceCode.DaedalusGlobals as DaedalusGlobals
 # import interpolation
 # import interpolation_OpenMP
 import numpy as np
@@ -244,7 +245,6 @@ def Interpolate_Serial(grid_lat,grid_lon,grid_lev,daed_lat,daed_lon,daed_alt,zg,
 
 
 
-MODELS_OUTPUT_FOLDER = "/home/NAS/Data_Files/ModelsOutput/Interpolation/"
 
 def Interpolator(model_data_file, orbit_file):
 # model data file--> netcdf to read model data from
@@ -270,7 +270,7 @@ def Interpolator(model_data_file, orbit_file):
     # TODO: if file exists just open it for append and check the Calculated attribute
     orbit_path = orbit_file[ 0 : orbit_file.rfind("/")+1]
     orbit_name = orbit_file[ orbit_file.rfind("/")+1 : -3]
-    result_filename = MODELS_OUTPUT_FOLDER + orbit_name + "_Interpolated" + ".nc"
+    result_filename = DaedalusGlobals.Interpolated_Files_Path + orbit_name + "_Interpolated" + ".nc"
     copyfile(orbit_file, result_filename)
     
     # Get data from Orbit
@@ -278,7 +278,7 @@ def Interpolator(model_data_file, orbit_file):
     
     daed_lat_temp = resultCDF.variables['lat'][:]
     daed_lon_temp = resultCDF.variables['lon'][:]
-    daed_alt_temp = resultCDF.variables['level'][:]
+    daed_alt_temp = resultCDF.variables['altitude'][:]
     daed_time_temp = resultCDF.variables['time'][:]
 
     # Get data from Model
