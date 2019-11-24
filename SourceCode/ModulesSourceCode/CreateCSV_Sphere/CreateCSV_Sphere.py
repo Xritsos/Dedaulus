@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import SourceCode.DaedalusGlobals as DaedalusGlobals
 
 
 '''
@@ -22,7 +23,7 @@ def CreateCSV_Sphere( CSVfilename, fixedDatetimeString, fixedAltitude, LatitudeS
     linesWritten = 0 # count how many lines you write in the CSV in order to inform the user at the end.
     
     if CSVfilename is None  or  len(CSVfilename)==0:
-        CSVfilename = "../../NAS/Data_Files/TMP/sphere.csv"
+        CSVfilename = DaedalusGlobals.Temporary_Files_Path + "sphere.csv"
     
 
     # open the new file as csv
