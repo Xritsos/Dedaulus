@@ -191,7 +191,8 @@ def CreateCDFstructure( CDFroot ):
     CDFroot.Type = "orbit"
     CDFroot.Calculated = "no"
     CDFroot.CreationTime = str(datetime.now())
-    CDFroot.ResetTime = str(datetime.now())
+    CDFroot.ResetTime    = str(datetime.now())
+    CDFroot.EditTime     = str(datetime.now())
     # create dimensions
     CDFroot.createDimension("altitude", None)
     CDFroot.createDimension("time",     None)
