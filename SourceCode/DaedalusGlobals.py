@@ -15,6 +15,9 @@ NetCDF_Files_Path = "/home/NAS/Data_Files/OrbitData/"
 # Absolute path where the filenames with calculated values reside.
 Processed_Files_Path = "/home/NAS/Data_Files/ModelOutputs/" 
 
+# Absolute path where temporary filenames 
+Temporary_Files_Path = "/home/NAS/Data_Files/Temp/" 
+
 
 # Absolute path where the filenames with the interpolated values reside.
 Interpolated_Files_Path = "/home/NAS/Data_Files/ModelOutputs/A_Interpolated/" 
