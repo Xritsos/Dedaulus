@@ -20,7 +20,8 @@ from netCDF4 import MFDataset
 import plotly
 import chart_studio.plotly as py # import plotly.plotly as py
 import csv
-import numpy as np           
+import numpy as np 
+import math
 from scipy.io import netcdf  
 from mpl_toolkits.basemap import Basemap
 import warnings
@@ -28,6 +29,7 @@ import warnings
 EarthRadius = 6378.137 # km - global, its value will not change through out the code
 LatStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 LonStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
+theSurfaceOpacity = 0.90
 
 # from plot.ly - convert degrees to radians
 def degree2radians(degree):    
@@ -106,9 +108,13 @@ ARGUMENTS:
   PlotTitle: A title which is displayed on the top of the plot.
 RETURNS: a string containing information about the Data
 '''
-def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, SurfaceColorscaleName, OrbitFilename, OrbitVariableToPlot, OrbitColorbarTitle, OrbitColorscaleName, PlotTitle ):
+def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, SurfaceColorscaleName, OrbitFilename, OrbitVariableToPlot, OrbitColorbarTitle, OrbitColorscaleName, PlotTitle, VectorsFilename="", VectorsVariableToPlot="", VectorsColorbarTitle="", VectorsColorscaleName="Jet", SurfaceOpacity=0.90 ):
     result = ""
     startSecs = time.time()
+
+    global theSurfaceOpacity
+    theSurfaceOpacity = SurfaceOpacity
+    
     
     # define colorscales for ploting
     colorscaleWhite=[[0.0, '#ffffff'], [1.0, '#ffffff']]
@@ -159,6 +165,7 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     # define the layout of the plot
     theLayout = dict(
         title = PlotTitle,
+        width=1000, height=800,
         scene = dict(
             xaxis = dict( zeroline=False ), yaxis = dict( zeroline=False ), zaxis = dict( zeroline=False ),
             aspectratio=dict(x=1, y=1,z=1), camera=dict(eye=dict(x=1.20, y=1.20, z=1.20))
@@ -166,14 +173,19 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     )
     
     #### read the surface Data file and find the Altitude of the surface described by the data file
-    Altitude = CalculateAltitudeFromData( SurfaceFilename )
+    if len(SurfaceFilename) > 0:
+        Altitude = CalculateAltitudeFromData( SurfaceFilename )
         
     #### read the Data file into an Array
-    SurfaceData =  SurfaceFile_to_array( SurfaceFilename, SurfaceVariableToPlot ) 
+    if len(SurfaceFilename) > 0:
+        SurfaceData =  SurfaceFile_to_array( SurfaceFilename, SurfaceVariableToPlot ) 
+    else:
+        SurfaceData = None
     
     #### read the Orbit Data file into an Array
     OrbitData =  OrbitFile_to_array( OrbitFilename, OrbitVariableToPlot) 
    
+
     #### Calculate min / max values of all plotable data 
     # calculate min/max for the surface data
     if len(SurfaceFilename) > 0:
@@ -199,6 +211,93 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
         Plotables.append( CreatePlotable_Surface(SurfaceData, Altitude, SurfaceMin, SurfaceMax, SurfaceColorscaleName, SurfaceColorbarTitle) )        
     if len(OrbitFilename) > 0:
         Plotables.append( CreatePlotable_Orbit(OrbitData, OrbitMin, OrbitMax, OrbitColorscaleName, OrbitColorbarTitle) )
+        
+    # For vectors
+    if len(VectorsFilename) > 0:
+        # construct Altitudes, Longtitudes, Altitudes 1D arrays
+        V_Lats = list()
+        V_Lons = list()
+        V_Alts = list()
+        VectorX = list()
+        VectorY = list()
+        VectorZ = list()
+        latidx = 0
+        lonidx = 0
+        # open NectCDF file and read the variables
+        CDFroot = Dataset( VectorsFilename, 'r' )        
+        for i in np.arange(-88.75, 90, 2.5): # for i in np.arange(87.5, -92.5, -5.0):
+            lonidx = 0
+            N = EarthRadius
+            for j in np.arange(-180.0,  177.5, 2.5): # for j in np.arange(-180.0,  180.0, 5.0):
+                aLat = degree2radians( i )
+                aLon = degree2radians( j )
+                V_Lats.append( (N+100) * math.cos(aLat) * math.cos(aLon) )
+                V_Lons.append( (N+100) * math.cos(aLat) * math.sin(aLon) )
+                V_Alts.append( (N+100) * math.sin(aLat) )
+                VectorX.append( CDFroot.variables[VectorsVariableToPlot+"x"][1,0,latidx,lonidx] )
+                VectorY.append( CDFroot.variables[VectorsVariableToPlot+"y"][1,0,latidx,lonidx] )
+                VectorZ.append( CDFroot.variables[VectorsVariableToPlot+"z"][1,0,latidx,lonidx] )
+                lonidx = lonidx + 1
+            latidx = latidx + 1
+        CDFroot.close()
+        VectorX = np.asarray(VectorX, dtype=np.float64)
+        VectorY = np.asarray(VectorY, dtype=np.float64)
+        VectorZ = np.asarray(VectorZ, dtype=np.float64)
+        
+        #print( len(VectorX), len(VectorY), len(VectorZ), len(V_Lats), len(V_Lons), len(V_Alts) )
+        #np.set_printoptions(suppress=False)
+        #np.set_printoptions(precision=12)
+        
+        VectorCones = dict(type='cone',
+              x=V_Lats,  y=V_Lons,  z=V_Alts,
+              u=VectorX, v=VectorY, w=VectorZ,
+              sizemode='scaled', sizeref=45,
+              colorscale=VectorsColorscaleName, anchor='tip',
+              colorbar=dict(thickness=20, len=0.75, ticklen=4, title=dict(text=VectorsColorbarTitle,side="top"), xanchor="center", x=0) 
+        )
+        
+        '''
+        Test: display seminal citiies
+        n=0
+        for i in np.arange(-88.75, 90, 2.5):
+            for j in np.arange(-180.0,  177.5, 2.5):
+                break
+                n=n+1
+                if i==1.25 and j==0:
+                    print("zero ", Ex[n], Ey[n], Ez[n])
+                    Ex[n] = 10
+                    Ey[n] = 10
+                    Ez[n] = 10
+                if i==41.25 and j==-75:
+                    print("NY", Ex[n], Ey[n], Ez[n])
+                    Ex[n] = 10
+                    Ey[n] = 10
+                    Ez[n] = 10
+                if i==38.75 and j==25:
+                    print("Athens", Ex[n], Ey[n], Ez[n])
+                    Ex[n] = 10
+                    Ey[n] = 10
+                    Ez[n] = 10
+                if i==38.75 and j==140:
+                    print("Tokyo", Ex[n], Ey[n], Ez[n])
+                    Ex[n] = 10
+                    Ey[n] = 10
+                    Ez[n] = 10
+                if i==-33.75 and j==-70:
+                    print("Santiago", Ex[n], Ey[n], Ez[n])
+                    Ex[n] = 10
+                    Ey[n] = 10
+                    Ez[n] = 10
+                if i==-33.75 and j==150:
+                    print("Sydney", Ex[n], Ey[n], Ez[n])
+                    Ex[n] = 10
+                    Ey[n] = 10
+                    Ez[n] = 10                    
+        '''
+        #VectorCones = dict( type = "scatter3d", mode = "markers", x = V_Lats,  y = V_Lons,  z = V_Alts, showlegend = False, marker = dict(  size=3, color = Ex, colorscale = "Jet",  ),  )
+        
+        Plotables.append( VectorCones )
+    
 
     fig = dict( data=Plotables, layout=theLayout )
     # plot all
@@ -224,6 +323,7 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
 #    SurfaceFilename: the filename containing the data for the surface. Can be in csv or netCDF format.
 # Returns: the Altitude (float)
 def CalculateAltitudeFromData( SurfaceFilename ):
+    result = 0
     if len(SurfaceFilename) == 0:
         result = 0
     elif SurfaceFilename.endswith( ".csv" ):
@@ -233,8 +333,10 @@ def CalculateAltitudeFromData( SurfaceFilename ):
             result = float(   next( CSVreader )[3]   )
     else:
         CDFroot = Dataset( SurfaceFilename, 'r' )
-        #result = float( CDFroot.Elevation )
-        result = CDFroot.variables["altitude"][0]
+        try:
+            result = CDFroot.variables["altitude"][0]
+        except:
+            result=0 
         if result==0: 
             result = 2
         CDFroot.close()
@@ -290,6 +392,8 @@ def CalculateLatLonSteps( SurfaceFilename ):
             Lons = CDFroot.variables["lon"][:]
             theLonStep = abs( Lons[0] - Lons[1] )
         CDFroot.close()
+        theLatStep = 5 # zoro  # TODO explain or correct
+        theLonStep = 5 # zoro  # TODO explain or correct
     return theLatStep, theLonStep
 
 
@@ -347,7 +451,10 @@ def SurfaceFile_to_array( SurfaceFilename, VariableName ):
                             DataGrid[i, j] = RawData[x, 3]
                             break
         else: # the Panoply-oriented format for surfaces is used
-            DataGrid = CDFroot.variables[VariableName][:] 
+            DataGrid = np.asarray(CDFroot.variables[VariableName][1,0,:,:] , dtype=np.float64)
+            if len(DataGrid) > 36: # TODO explain or correct
+                DataGrid = DataGrid[0::2, 0::2]
+        ##
         CDFroot.close()
     ##
     return DataGrid
@@ -400,7 +507,10 @@ def CreatePlotable_Surface( Data, Altitude, MinValue, MaxValue , ColorScale, Col
     lon = np.hstack((tmp_lon[i_west], tmp_lon[i_east]))  # stack the 2 halves
     # Correspondingly, shift the Data array
     Data_ground = np.array(Data)
-    Data = np.hstack((Data_ground[:,i_west], Data_ground[:,i_east]))
+    try:  # TODO explain or correct
+        Data = np.hstack((Data_ground[:,i_west], Data_ground[:,i_east]))
+    except:
+        print( "Data NOT shifted." )
     
     # cut out a pizza slice
     #for i in range (0,16):
@@ -419,10 +529,10 @@ def CreatePlotable_Surface( Data, Altitude, MinValue, MaxValue , ColorScale, Col
     DATA = np.zeros(clons.shape, dtype=np.float64)
     DATA[1:nrows-1, :ncolumns-1] = np.copy(np.array(Data,  dtype=np.float64)) # ignore the extended values
     DATA[1:nrows-1,  ncolumns-1] = np.copy(Data[:, 0]) # ignore the extended values
-
+    
     # Create a sphere above earth which will be colored in accordance with the data
     DataSphere=dict(type='surface', x = XS,  y = YS,  z = ZS,
-        colorscale = ColorScale, surfacecolor = DATA, opacity = 0.90,
+        colorscale = ColorScale, surfacecolor = DATA, opacity = theSurfaceOpacity,
         cmin = MinValue, cmax = MaxValue,
         colorbar=dict(thickness=20, len=0.75, ticklen=4, title=ColorbarTitle),
     )
