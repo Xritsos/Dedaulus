@@ -4,8 +4,7 @@ from netCDF4 import Dataset  # https://unidata.github.io/netcdf4-python/netCDF4/
 from datetime import datetime
 import numpy as np
 import shutil 
-
-NETCDF_FILES_PATH = "/home/NAS/Data_Files/OrbitData/" # absolute path where the NetCDF filenames with the orbit data reside.
+import SourceCode.DaedalusGlobals as DaedalusGlobals
 
 
 '''
@@ -18,16 +17,21 @@ A tiny offset value is added to all Lat,Lon,Time values so that Panoply can plot
 RETURNS: the filename which has been created
 '''
 def CreateNETCDFsphere( fixedDatetimeString, fixedAltitude, LatitudeStep, LongitudeStep ):
+    
+    # if no date is provided then return an empty string
+    if fixedDatetimeString == "":
+        return "" # <<<<
+    
     # convert the Time-string to Unix Timestamp
     aTimeString = fixedDatetimeString[:-6] + " " + "+0000" # indicate explicity that this is UTC time
     TimeObj = datetime.strptime( aTimeString, "%b %d %Y %H:%M:%S.%f %z" ) 
     FixedTimestamp = float( datetime.timestamp(TimeObj) ) * 1000  # timestamp in milliseconds
 
     # copy the standard surface file to a temporary location, where we will process it
-    shutil.copyfile( NETCDF_FILES_PATH+"SurfaceTemplate.nc", NETCDF_FILES_PATH+"Surface.nc" )
+    shutil.copyfile( DaedalusGlobals.Temporary_Files_Path+"SurfaceTemplate.nc", DaedalusGlobals.Temporary_Files_Path+"Surface.nc" )
 
     # open file
-    CDFroot =  Dataset( NETCDF_FILES_PATH+"Surface.nc", "a")
+    CDFroot =  Dataset( DaedalusGlobals.Temporary_Files_Path+"Surface.nc", "a")
 
     # update general attributes
     CDFroot.Type = "surface"
@@ -41,9 +45,9 @@ def CreateNETCDFsphere( fixedDatetimeString, fixedAltitude, LatitudeStep, Longit
             CDFroot.variables["lat"][n] = i + 0.00000001*n # add a tiny offset, so that Panoply can plot the data as trajectory
             CDFroot.variables["lon"][n] = j + 0.00000001*n # add a tiny offset, so that Panoply can plot the data as trajectory
             #print( round(float(CDFroot.variables["lat"][n]),2), "    ",  round(float(CDFroot.variables["lon"][n]),2) )
-            CDFroot.variables["time"][n] = FixedTimestamp + n # add a tiny offset, so that Panoply can plot the data as trajectory
-            CDFroot.variables["level"][n] = fixedAltitude
-            CDFroot.variables["ALFA"][n] = np.random.random_sample() # assign random values for test purposes
+            CDFroot.variables["time"][n]     = FixedTimestamp + n # add a tiny offset, so that Panoply can plot the data as trajectory
+            CDFroot.variables["altitude"][n] = fixedAltitude
+            CDFroot.variables["ALFA"][n]     = np.random.random_sample() # assign random values for test purposes
             n = n + 1
 
     # close file
@@ -51,4 +55,4 @@ def CreateNETCDFsphere( fixedDatetimeString, fixedAltitude, LatitudeStep, Longit
     
     
        
-    return  NETCDF_FILES_PATH+"Surface.nc"
+    return  DaedalusGlobals.Temporary_Files_Path+"Surface.nc"

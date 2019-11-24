@@ -50,7 +50,7 @@ import os
 import multiprocessing
 from functools import partial
 from shutil import copyfile
-
+import os
 
 
 def local(dim1,y,x):
@@ -253,7 +253,8 @@ def Interpolator(model_data_file, orbit_file):
 # VAR--> string array:: variables to inteprolate, must be  one of the variables included in the model data
 #Outputs:: Plots+ 1 csv file
 
-
+    if orbit_file=="":
+        return "" # <<<<
 
     save=True
     VAR=["NE","DEN","HE","NO","O1","O2","OP","TN","UI_ExB","VI_ExB","WI_ExB","UN","VN"]
@@ -271,10 +272,15 @@ def Interpolator(model_data_file, orbit_file):
     orbit_path = orbit_file[ 0 : orbit_file.rfind("/")+1]
     orbit_name = orbit_file[ orbit_file.rfind("/")+1 : -3]
     result_filename = DaedalusGlobals.Interpolated_Files_Path + orbit_name + "_Interpolated" + ".nc"
-    copyfile(orbit_file, result_filename)
+    if os.path.isfile(result_filename)==False  or  "Surface" in result_filename:
+        copyfile(orbit_file, result_filename)
     
     # Get data from Orbit
-    resultCDF=Dataset(orbit_file,"a")
+    resultCDF=Dataset(result_filename, "a")
+    
+    if resultCDF.Calculated == "yes":
+        print ("Skipping calculation because values are valid for" , result_filename)
+        return result_filename # <<<<
     
     daed_lat_temp = resultCDF.variables['lat'][:]
     daed_lon_temp = resultCDF.variables['lon'][:]
@@ -381,7 +387,10 @@ def Interpolator(model_data_file, orbit_file):
             # **********************************************************************§
 
     t2=time.time()
-    resultCDF.close()
+    resultCDF.Calculated = "yes"
+    resultCDF.EditTime   = str(datetime.now())
+    resultCDF.close()    
+    
     print("Interpolation Finished in ",str(t2-t1),"s")
     
     return result_filename

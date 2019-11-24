@@ -136,7 +136,7 @@ def FillNETCDF_button_clicked( b ):
                 FillCDF_withCSVdata( CDFroot, DaedalusGlobals.CSV_Files_Path+orbitname+".csv" ) # fill with data from the csv file
                 CDFroot.close() # close file
                 #### Create the NetCDF template file for the surface as well, so that it's structure is always up-to-date
-                CDFroot =  Dataset( DaedalusGlobals.NetCDF_Files_Path + "SurfaceTemplate.nc", 'w') # open file
+                CDFroot =  Dataset( DaedalusGlobals.Temporary_Files_Path + "SurfaceTemplate.nc", 'w') # open file
                 CreateCDFstructure( CDFroot ) # create the structure
                 CDFroot.close() # close file
             except Exception as err:
@@ -191,7 +191,8 @@ def CreateCDFstructure( CDFroot ):
     CDFroot.Type = "orbit"
     CDFroot.Calculated = "no"
     CDFroot.CreationTime = str(datetime.now())
-    CDFroot.ResetTime = str(datetime.now())
+    CDFroot.ResetTime    = str(datetime.now())
+    CDFroot.EditTime     = str(datetime.now())
     # create dimensions
     CDFroot.createDimension("altitude", None)
     CDFroot.createDimension("time",     None)
@@ -369,7 +370,7 @@ def Create_NetCDF_surface( CDFroot, OrbitTemplate_CDFroot ):
 # USAGE:
 #### Create the NetCDF for the surface as well ( a sphere around Earth, with the same structure as the orbit file )
 orbitTemplateCDFroot = Dataset(DaedalusGlobals.NetCDF_Files_Path+orbitname+".nc", 'r')
-SurfaceCDFroot = Dataset(DaedalusGlobals.NetCDF_Files_Path+"Surface.nc", 'w')
+SurfaceCDFroot = Dataset(DaedalusGlobals.Temporary_Files_Path+"Surface.nc", 'w')
 Create_NetCDF_surface( SurfaceCDFroot, orbitTemplateCDFroot )
 orbitTemplateCDFroot.close()
 SurfaceCDFroot.close()  
