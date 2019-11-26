@@ -1859,4 +1859,3 @@ def Construct_MSISE00():
 	MSISE00_Panel.children += (OutputsPanel,)
 	return MSISE00_Panel
 
-
