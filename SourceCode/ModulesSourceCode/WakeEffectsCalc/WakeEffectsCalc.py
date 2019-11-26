@@ -13,13 +13,12 @@ def WakeEffectsCalc( InputFilename ):
     ResultFilename = DaedalusGlobals.Stimuli_Files_Path + simple_InputFilename + "_Stimuli" + ".nc"
     if os.path.isfile(ResultFilename) == False :
         copyfile(InputFilename, ResultFilename)
-    if Enabled:
-        # open the file and store your calculations
-        resultCDF=Dataset(ResultFilename, "a")
-        '''
-        Here you can write source code for storing calculations into the result NetCDF file
-        '''
-        resultCDF.EditTime   = str(datetime.now())
-        resultCDF.close()    
+    # open the file and store your calculations
+    resultCDF=Dataset(ResultFilename, "a")
+    '''
+    Here you can write source code for storing calculations into the result NetCDF file
+    '''
+    resultCDF.EditTime   = str(datetime.now())
+    resultCDF.close()    
     ##
     return ResultFilename
