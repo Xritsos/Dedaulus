@@ -1381,32 +1381,32 @@ def Construct_TopLevel():
 	OutputsPanel.children += (WIDGET_ChargingEffectsCalc_ResultFilename,)
 	TopLevel_Panel.children += (OutputsPanel,)
 	########
-	## GUI code for module 'DerivedProductsCalc '
+	## GUI code for module 'DerivedProductsCalc'
 	########
 	# Create widgets for module's inputs
 	InputsPanel = widgets.VBox()
 	InputsPanel.layout.min_width = '330px'
-	WIDGET_DerivedProductsCalc _InputFilename = widgets.Label(value='  InstrumentGNSS.ResultFilename --> InputFilename  ')
-	WIDGET_DerivedProductsCalc _InputFilename.layout.border = '1px dashed blue'
-	WIDGET_DerivedProductsCalc _InputFilename.layout.padding = '0px 10px 0px 10px'
-	InputsPanel.children += (WIDGET_DerivedProductsCalc _InputFilename,)
+	WIDGET_DerivedProductsCalc_InputFilename = widgets.Label(value='  InstrumentGNSS.ResultFilename --> InputFilename  ')
+	WIDGET_DerivedProductsCalc_InputFilename.layout.border = '1px dashed blue'
+	WIDGET_DerivedProductsCalc_InputFilename.layout.padding = '0px 10px 0px 10px'
+	InputsPanel.children += (WIDGET_DerivedProductsCalc_InputFilename,)
 	TopLevel_Panel.children += (InputsPanel,)
 	# Create widget for the moudle black-box body
-	DerivedProductsCalc _Btn = widgets.Button (
-		description='DerivedProductsCalc ',
+	DerivedProductsCalc_Btn = widgets.Button (
+		description='DerivedProductsCalc',
 		tooltip="",
 	)
-	DerivedProductsCalc _Btn.layout.min_width = '200px'
-	DerivedProductsCalc _Btn.style.button_color = 'IndianRed'
-	TopLevel_Panel.children += (DerivedProductsCalc _Btn,)
+	DerivedProductsCalc_Btn.layout.min_width = '200px'
+	DerivedProductsCalc_Btn.style.button_color = 'IndianRed'
+	TopLevel_Panel.children += (DerivedProductsCalc_Btn,)
 	# Create widgets for module's outputs
 	OutputsPanel = widgets.VBox()
 	OutputsPanel.layout.min_width = '300px'
-	WIDGET_DerivedProductsCalc _ResultFilename = widgets.Label(value='  --> ResultFilename  ')
-	WIDGET_DerivedProductsCalc _ResultFilename.layout.border = '1px dashed green'
-	WIDGET_DerivedProductsCalc _ResultFilename.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_DerivedProductsCalc _ResultFilename.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_DerivedProductsCalc _ResultFilename,)
+	WIDGET_DerivedProductsCalc_ResultFilename = widgets.Label(value='  --> ResultFilename  ')
+	WIDGET_DerivedProductsCalc_ResultFilename.layout.border = '1px dashed green'
+	WIDGET_DerivedProductsCalc_ResultFilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_DerivedProductsCalc_ResultFilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_DerivedProductsCalc_ResultFilename,)
 	TopLevel_Panel.children += (OutputsPanel,)
 	return TopLevel_Panel
 
