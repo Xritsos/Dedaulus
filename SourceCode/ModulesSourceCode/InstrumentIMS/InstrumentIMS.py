@@ -10,8 +10,6 @@ Please write here a description of the module's inputs, outputs and function
 def InstrumentIMS( InputFilename ):
     # copy input file to your dedicated folder (if not exists already) in order to process it
     simple_InputFilename = InputFilename[ InputFilename.rfind("/")+1 : InputFilename.rfind("_") ]
-    #print( simple_InputFilename )
-    #return
     ResultFilename = DaedalusGlobals.SyntheticScience_Files_Path + simple_InputFilename + "_SyntheticScience" + ".nc"
     if os.path.isfile(ResultFilename) == False :
         copyfile(InputFilename, ResultFilename)
