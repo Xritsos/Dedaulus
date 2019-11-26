@@ -7,13 +7,9 @@ import os
 """
 Please write here a description of the module's inputs, outputs and function
 """
-def SGV_B( InputFilename, Enabled=True ):
-    # copy input file to your dedicated folder (if not exists already) in order to process it
-    simple_InputFilename = InputFilename[ InputFilename.rfind("/")+1 : InputFilename.rfind("_") ]
-    ResultFilename = DaedalusGlobals.SyntheticTruth_Files_Path + simple_InputFilename + "_SyntheticTruth" + ".nc"
-    if os.path.isfile(ResultFilename) == False :
-        copyfile(InputFilename, ResultFilename)
-    if Enabled:
+def DerivedProductsCalc( InputFilename ):
+    ResultFilename = InputFilename
+    if os.path.isfile(ResultFilename):
         # open the file and store your calculations
         resultCDF=Dataset(ResultFilename, "a")
         '''

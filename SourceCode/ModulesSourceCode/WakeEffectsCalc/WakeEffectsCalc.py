@@ -7,10 +7,10 @@ import os
 """
 Please write here a description of the module's inputs, outputs and function
 """
-def SGV_B( InputFilename, Enabled=True ):
+def WakeEffectsCalc( InputFilename ):
     # copy input file to your dedicated folder (if not exists already) in order to process it
     simple_InputFilename = InputFilename[ InputFilename.rfind("/")+1 : InputFilename.rfind("_") ]
-    ResultFilename = DaedalusGlobals.SyntheticTruth_Files_Path + simple_InputFilename + "_SyntheticTruth" + ".nc"
+    ResultFilename = DaedalusGlobals.Stimuli_Files_Path + simple_InputFilename + "_Stimuli" + ".nc"
     if os.path.isfile(ResultFilename) == False :
         copyfile(InputFilename, ResultFilename)
     if Enabled:

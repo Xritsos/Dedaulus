@@ -7,19 +7,20 @@ import os
 """
 Please write here a description of the module's inputs, outputs and function
 """
-def SGV_B( InputFilename, Enabled=True ):
+def InstrumentEPDS3( InputFilename ):
     # copy input file to your dedicated folder (if not exists already) in order to process it
     simple_InputFilename = InputFilename[ InputFilename.rfind("/")+1 : InputFilename.rfind("_") ]
-    ResultFilename = DaedalusGlobals.SyntheticTruth_Files_Path + simple_InputFilename + "_SyntheticTruth" + ".nc"
+    ResultFilename = DaedalusGlobals.SyntheticScience_Files_Path + simple_InputFilename + "_SyntheticScience" + ".nc"
     if os.path.isfile(ResultFilename) == False :
         copyfile(InputFilename, ResultFilename)
-    if Enabled:
-        # open the file and store your calculations
-        resultCDF=Dataset(ResultFilename, "a")
-        '''
-        Here you can write source code for storing calculations into the result NetCDF file
-        '''
-        resultCDF.EditTime   = str(datetime.now())
-        resultCDF.close()    
+
+    # open the file and store your calculations
+    resultCDF=Dataset(ResultFilename, "a")
+    '''
+    Here you can write source code for storing calculations into the result NetCDF file
+    '''
+    resultCDF.EditTime   = str(datetime.now())
+    resultCDF.close()    
+        
     ##
     return ResultFilename
