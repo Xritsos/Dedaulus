@@ -1256,11 +1256,16 @@ def Construct_TopLevel():
 	# Create widgets for module's outputs
 	OutputsPanel = widgets.VBox()
 	OutputsPanel.layout.min_width = '300px'
-	WIDGET_OrbitSelector_OrbitFilename = widgets.Label(value='  --> OrbitFilename  ')
-	WIDGET_OrbitSelector_OrbitFilename.layout.border = '1px dashed green'
-	WIDGET_OrbitSelector_OrbitFilename.layout.margin ='0px 40px 0px 0px' 
-	WIDGET_OrbitSelector_OrbitFilename.layout.padding ='0px 10px 0px 10px' 
-	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitFilename,)
+	WIDGET_OrbitSelector_OrbitCSVfilename = widgets.Label(value='  --> OrbitCSVfilename  ')
+	WIDGET_OrbitSelector_OrbitCSVfilename.layout.border = '1px dashed green'
+	WIDGET_OrbitSelector_OrbitCSVfilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_OrbitSelector_OrbitCSVfilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitCSVfilename,)
+	WIDGET_OrbitSelector_OrbitNetCDFfilename = widgets.Label(value='  --> OrbitNetCDFfilename  ')
+	WIDGET_OrbitSelector_OrbitNetCDFfilename.layout.border = '1px dashed green'
+	WIDGET_OrbitSelector_OrbitNetCDFfilename.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_OrbitSelector_OrbitNetCDFfilename.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_OrbitSelector_OrbitNetCDFfilename,)
 	TopLevel_Panel.children += (OutputsPanel,)
 	########
 	## GUI code for module 'Selector'
@@ -1302,7 +1307,7 @@ def Construct_TopLevel():
 	WIDGET_Interpolator_ModelFile.description = 'ModelFile'
 	WIDGET_Interpolator_ModelFile.layout.border = '1px dashed blue'
 	InputsPanel.children += (WIDGET_Interpolator_ModelFile,)
-	WIDGET_Interpolator_OrbitFile = widgets.Label(value='  OrbitSelector.OrbitFilename --> OrbitFile  ')
+	WIDGET_Interpolator_OrbitFile = widgets.Label(value='  OrbitSelector.OrbitNetCDFfilename --> OrbitFile  ')
 	WIDGET_Interpolator_OrbitFile.layout.border = '1px dashed blue'
 	WIDGET_Interpolator_OrbitFile.layout.padding = '0px 10px 0px 10px'
 	InputsPanel.children += (WIDGET_Interpolator_OrbitFile,)
