@@ -28,6 +28,37 @@ from SourceCode.ModulesSourceCode.Interpolator.Interpolator import Interpolator
 from SourceCode.ModulesSourceCode.CreateNETCDFsphere.CreateNETCDFsphere import CreateNETCDFsphere
 from SourceCode.ModulesSourceCode.Interpolator.Interpolator import Interpolator
 from SourceCode.ModulesSourceCode.PlotGlobe.PlotGlobe import PlotGlobe
+from SourceCode.ModulesSourceCode.OrbitSelector.OrbitSelector import OrbitSelector
+from SourceCode.ModulesSourceCode.Selector.Selector import Selector
+from SourceCode.ModulesSourceCode.Interpolator.Interpolator import Interpolator
+from SourceCode.ModulesSourceCode.SGV_vi.SGV_vi import SGV_vi
+from SourceCode.ModulesSourceCode.SGV_Ti.SGV_Ti import SGV_Ti
+from SourceCode.ModulesSourceCode.SGV_Te.SGV_Te import SGV_Te
+from SourceCode.ModulesSourceCode.SGV_Ni.SGV_Ni import SGV_Ni
+from SourceCode.ModulesSourceCode.SGV_nix.SGV_nix import SGV_nix
+from SourceCode.ModulesSourceCode.SGV_Ne.SGV_Ne import SGV_Ne
+from SourceCode.ModulesSourceCode.SGV_TEC.SGV_TEC import SGV_TEC
+from SourceCode.ModulesSourceCode.SGV_un.SGV_un import SGV_un
+from SourceCode.ModulesSourceCode.SGV_Tn.SGV_Tn import SGV_Tn
+from SourceCode.ModulesSourceCode.SGV_Nn.SGV_Nn import SGV_Nn
+from SourceCode.ModulesSourceCode.SGV_nnx.SGV_nnx import SGV_nnx
+from SourceCode.ModulesSourceCode.SGV_JEPP.SGV_JEPP import SGV_JEPP
+from SourceCode.ModulesSourceCode.SGV_B.SGV_B import SGV_B
+from SourceCode.ModulesSourceCode.SGV_E.SGV_E import SGV_E
+from SourceCode.ModulesSourceCode.WakeEffectsCalc.WakeEffectsCalc import WakeEffectsCalc
+from SourceCode.ModulesSourceCode.ChargingEffectsCalc.ChargingEffectsCalc import ChargingEffectsCalc
+from SourceCode.ModulesSourceCode.InstrumentIDMRPA.InstrumentIDMRPA import InstrumentIDMRPA
+from SourceCode.ModulesSourceCode.InstrumentTII.InstrumentTII import InstrumentTII
+from SourceCode.ModulesSourceCode.InstrumentRWSCWS.InstrumentRWSCWS import InstrumentRWSCWS
+from SourceCode.ModulesSourceCode.InstrumentIMS.InstrumentIMS import InstrumentIMS
+from SourceCode.ModulesSourceCode.InstrumentNMS.InstrumentNMS import InstrumentNMS
+from SourceCode.ModulesSourceCode.InstrumentACC.InstrumentACC import InstrumentACC
+from SourceCode.ModulesSourceCode.InstrumentEPDS3.InstrumentEPDS3 import InstrumentEPDS3
+from SourceCode.ModulesSourceCode.InstrumentEFI.InstrumentEFI import InstrumentEFI
+from SourceCode.ModulesSourceCode.InstrumentMIP.InstrumentMIP import InstrumentMIP
+from SourceCode.ModulesSourceCode.InstrumentMAG.InstrumentMAG import InstrumentMAG
+from SourceCode.ModulesSourceCode.InstrumentGNSS.InstrumentGNSS import InstrumentGNSS
+from SourceCode.ModulesSourceCode.DerivedProductsCalc .DerivedProductsCalc  import DerivedProductsCalc 
 import SourceCode.PanelDisplayer as PanelDisplayer
 
 def Display( *arg ): # in order to avoid circular dependent imports
@@ -57,6 +88,29 @@ def Execute_IGRF():
 	Display( '          MeshgridResultCSV: ' + str(IGRF_MeshgridResultCSV) )
 	PlotGlobe( IGRF_MeshgridResultCSV, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, IGRF_OrbitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
 	Display( '    PlotGlobe( ' , IGRF_MeshgridResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , IGRF_OrbitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
+	Display( '          -void-' )
+	Display('')
+"""
+Executes these Simulation Modules:
+  OrbitSelector  Interpolator  CreateNETCDFsphere  Interpolator  PlotGlobe  
+"""
+def Execute_Interpolator_NetCDF():
+	Display('Executing Interpolator_NetCDF:')
+	OrbitSelector_OrbitCSVfilename, OrbitSelector_OrbitNetCDFfilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
+	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
+	Display( '          OrbitCSVfilename: ' + str(OrbitSelector_OrbitCSVfilename) )
+	Display( '          OrbitNetCDFfilename: ' + str(OrbitSelector_OrbitNetCDFfilename) )
+	Interpolator_InterpolatedOrbit = Interpolator( PanelDisplayer.WIDGET_Interpolator_ModelFile_forOrbit.value, OrbitSelector_OrbitNetCDFfilename )
+	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_ModelFile_forOrbit.value,', ' , OrbitSelector_OrbitNetCDFfilename , ' ) results:')
+	Display( '          InterpolatedOrbit: ' + str(Interpolator_InterpolatedOrbit) )
+	CreateNETCDFsphere_theSurfaceFilename = CreateNETCDFsphere( PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedDatetimeString.value, PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedAltitude.value, PanelDisplayer.WIDGET_CreateNETCDFsphere_LatitudeStep.value, PanelDisplayer.WIDGET_CreateNETCDFsphere_LongitudeStep.value )
+	Display( '    CreateNETCDFsphere( ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedDatetimeString.value,', ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedAltitude.value,', ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_LatitudeStep.value,', ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_LongitudeStep.value , ' ) results:')
+	Display( '          theSurfaceFilename: ' + str(CreateNETCDFsphere_theSurfaceFilename) )
+	Interpolator_InterpolatedSurface = Interpolator( PanelDisplayer.WIDGET_Interpolator_ModelFile_forSurface.value, CreateNETCDFsphere_theSurfaceFilename )
+	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_ModelFile_forSurface.value,', ' , CreateNETCDFsphere_theSurfaceFilename , ' ) results:')
+	Display( '          InterpolatedSurface: ' + str(Interpolator_InterpolatedSurface) )
+	PlotGlobe( Interpolator_InterpolatedSurface, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, Interpolator_InterpolatedOrbit, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
+	Display( '    PlotGlobe( ' , Interpolator_InterpolatedSurface,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , Interpolator_InterpolatedOrbit,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
 	Display( '          -void-' )
 	Display('')
 """
@@ -127,6 +181,123 @@ def Execute_IRI16():
 	Display('')
 """
 Executes these Simulation Modules:
+  OrbitSelector  Selector  Interpolator  SGV_vi  SGV_Ti  SGV_Te  SGV_Ni  SGV_nix  SGV_Ne  SGV_TEC  SGV_un  SGV_Tn  SGV_Nn  SGV_nnx  SGV_JEPP  SGV_B  SGV_E  WakeEffectsCalc  ChargingEffectsCalc  InstrumentIDMRPA  InstrumentTII  InstrumentRWSCWS  InstrumentIMS  InstrumentNMS  InstrumentACC  InstrumentEPDS3  InstrumentEFI  InstrumentMIP  InstrumentMAG  InstrumentGNSS  DerivedProductsCalc   
+"""
+def Execute_TopLevel():
+	Display('Executing TopLevel:')
+	OrbitSelector_OrbitFilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
+	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
+	Display( '          OrbitFilename: ' + str(OrbitSelector_OrbitFilename) )
+	Selector_EnableSubGridVariabilityOUT = Selector( PanelDisplayer.WIDGET_Selector_EnableSubGridVariability.value )
+	Display( '    Selector( ' , PanelDisplayer.WIDGET_Selector_EnableSubGridVariability.value , ' ) results:')
+	Display( '          EnableSubGridVariabilityOUT: ' + str(Selector_EnableSubGridVariabilityOUT) )
+	Interpolator_InterpolatorResultFilename = Interpolator( PanelDisplayer.WIDGET_Interpolator_ModelFile.value, OrbitSelector_OrbitFilename )
+	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_ModelFile.value,', ' , OrbitSelector_OrbitFilename , ' ) results:')
+	Display( '          InterpolatorResultFilename: ' + str(Interpolator_InterpolatorResultFilename) )
+	SGV_vi_ResultFilename = SGV_vi( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_vi( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_vi_ResultFilename) )
+	SGV_Ti_ResultFilename = SGV_Ti( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_Ti( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_Ti_ResultFilename) )
+	SGV_Te_ResultFilename = SGV_Te( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_Te( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_Te_ResultFilename) )
+	SGV_Ni_ResultFilename = SGV_Ni( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_Ni( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_Ni_ResultFilename) )
+	SGV_nix_ResultFilename = SGV_nix( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_nix( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_nix_ResultFilename) )
+	SGV_Ne_ResultFilename = SGV_Ne( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_Ne( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_Ne_ResultFilename) )
+	SGV_TEC_ResultFilename = SGV_TEC( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_TEC( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_TEC_ResultFilename) )
+	SGV_un_ResultFilename = SGV_un( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_un( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_un_ResultFilename) )
+	SGV_Tn_ResultFilename = SGV_Tn( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_Tn( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_Tn_ResultFilename) )
+	SGV_Nn_ResultFilename = SGV_Nn( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_Nn( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_Nn_ResultFilename) )
+	SGV_nnx_ResultFilename = SGV_nnx( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_nnx( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_nnx_ResultFilename) )
+	SGV_JEPP_ResultFilename = SGV_JEPP( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_JEPP( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_JEPP_ResultFilename) )
+	SGV_B_ResultFilename = SGV_B( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_B( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_B_ResultFilename) )
+	SGV_E_ResultFilename = SGV_E( Interpolator_InterpolatorResultFilename, Selector_EnableSubGridVariabilityOUT )
+	Display( '    SGV_E( ' , Interpolator_InterpolatorResultFilename,', ' , Selector_EnableSubGridVariabilityOUT , ' ) results:')
+	Display( '          ResultFilename: ' + str(SGV_E_ResultFilename) )
+	WakeEffectsCalc_ResultFilename = WakeEffectsCalc( SGV_E_ResultFilename )
+	Display( '    WakeEffectsCalc( ' , SGV_E_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(WakeEffectsCalc_ResultFilename) )
+	ChargingEffectsCalc_ResultFilename = ChargingEffectsCalc( SGV_E_ResultFilename )
+	Display( '    ChargingEffectsCalc( ' , SGV_E_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(ChargingEffectsCalc_ResultFilename) )
+	InstrumentIDMRPA_ResultFilename = InstrumentIDMRPA( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentIDMRPA( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentIDMRPA_ResultFilename) )
+	InstrumentTII_ResultFilename = InstrumentTII( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentTII( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentTII_ResultFilename) )
+	InstrumentRWSCWS_ResultFilename = InstrumentRWSCWS( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentRWSCWS( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentRWSCWS_ResultFilename) )
+	InstrumentIMS_ResultFilename = InstrumentIMS( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentIMS( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentIMS_ResultFilename) )
+	InstrumentNMS_ResultFilename = InstrumentNMS( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentNMS( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentNMS_ResultFilename) )
+	InstrumentACC_ResultFilename = InstrumentACC( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentACC( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentACC_ResultFilename) )
+	InstrumentEPDS3_ResultFilename = InstrumentEPDS3( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentEPDS3( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentEPDS3_ResultFilename) )
+	InstrumentEFI_ResultFilename = InstrumentEFI( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentEFI( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentEFI_ResultFilename) )
+	InstrumentMIP_ResultFilename = InstrumentMIP( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentMIP( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentMIP_ResultFilename) )
+	InstrumentMAG_ResultFilename = InstrumentMAG( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentMAG( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentMAG_ResultFilename) )
+	InstrumentGNSS_ResultFilename = InstrumentGNSS( EnvToInsTrasnfer_ResultFilename )
+	Display( '    InstrumentGNSS( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(InstrumentGNSS_ResultFilename) )
+	DerivedProductsCalc _ResultFilename = DerivedProductsCalc ( InstrumentGNSS_ResultFilename )
+	Display( '    DerivedProductsCalc ( ' , InstrumentGNSS_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(DerivedProductsCalc _ResultFilename) )
+	Display('')
+"""
+Executes these Simulation Modules:
+  OrbitSelector  Interpolator  PlotGlobe  
+"""
+def Execute_Interpolator():
+	Display('Executing Interpolator:')
+	OrbitSelector_OrbitCSVfilename, OrbitSelector_OrbitNetCDFfilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
+	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
+	Display( '          OrbitCSVfilename: ' + str(OrbitSelector_OrbitCSVfilename) )
+	Display( '          OrbitNetCDFfilename: ' + str(OrbitSelector_OrbitNetCDFfilename) )
+	Interpolator_InterpolatedOrbitCSV = Interpolator( PanelDisplayer.WIDGET_Interpolator_model.value, PanelDisplayer.WIDGET_Interpolator_model_data_file.value, OrbitSelector_OrbitCSVfilename, PanelDisplayer.WIDGET_Interpolator_save.value, PanelDisplayer.WIDGET_Interpolator_VAR.value )
+	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_model.value,', ' , PanelDisplayer.WIDGET_Interpolator_model_data_file.value,', ' , OrbitSelector_OrbitCSVfilename,', ' , PanelDisplayer.WIDGET_Interpolator_save.value,', ' , PanelDisplayer.WIDGET_Interpolator_VAR.value , ' ) results:')
+	Display( '          InterpolatedOrbitCSV: ' + str(Interpolator_InterpolatedOrbitCSV) )
+	PlotGlobe( PanelDisplayer.WIDGET_PlotGlobe_SurfaceFilename.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, Interpolator_InterpolatedOrbitCSV, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
+	Display( '    PlotGlobe( ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceFilename.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , Interpolator_InterpolatedOrbitCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
+	Display( '          -void-' )
+	Display('')
+"""
+Executes these Simulation Modules:
   OrbitSelector  MSISE00  CreateCSV_Sphere  MSISE00  PlotGlobe  
 """
 def Execute_MSISE00():
@@ -148,45 +319,5 @@ def Execute_MSISE00():
 	Display( '          MeshgridResultCSV: ' + str(MSISE00_MeshgridResultCSV) )
 	PlotGlobe( MSISE00_MeshgridResultCSV, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, MSISE00_ObitResultCSV, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
 	Display( '    PlotGlobe( ' , MSISE00_MeshgridResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , MSISE00_ObitResultCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
-	Display( '          -void-' )
-	Display('')
-"""
-Executes these Simulation Modules:
-  OrbitSelector  Interpolator  PlotGlobe  
-"""
-def Execute_Interpolator():
-	Display('Executing Interpolator:')
-	OrbitSelector_OrbitCSVfilename, OrbitSelector_OrbitNetCDFfilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
-	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
-	Display( '          OrbitCSVfilename: ' + str(OrbitSelector_OrbitCSVfilename) )
-	Display( '          OrbitNetCDFfilename: ' + str(OrbitSelector_OrbitNetCDFfilename) )
-	Interpolator_InterpolatedOrbitCSV = Interpolator( PanelDisplayer.WIDGET_Interpolator_model.value, PanelDisplayer.WIDGET_Interpolator_model_data_file.value, OrbitSelector_OrbitCSVfilename, PanelDisplayer.WIDGET_Interpolator_save.value, PanelDisplayer.WIDGET_Interpolator_VAR.value )
-	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_model.value,', ' , PanelDisplayer.WIDGET_Interpolator_model_data_file.value,', ' , OrbitSelector_OrbitCSVfilename,', ' , PanelDisplayer.WIDGET_Interpolator_save.value,', ' , PanelDisplayer.WIDGET_Interpolator_VAR.value , ' ) results:')
-	Display( '          InterpolatedOrbitCSV: ' + str(Interpolator_InterpolatedOrbitCSV) )
-	PlotGlobe( PanelDisplayer.WIDGET_PlotGlobe_SurfaceFilename.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, Interpolator_InterpolatedOrbitCSV, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
-	Display( '    PlotGlobe( ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceFilename.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , Interpolator_InterpolatedOrbitCSV,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
-	Display( '          -void-' )
-	Display('')
-"""
-Executes these Simulation Modules:
-  OrbitSelector  Interpolator  CreateNETCDFsphere  Interpolator  PlotGlobe  
-"""
-def Execute_Interpolator_NetCDF():
-	Display('Executing Interpolator_NetCDF:')
-	OrbitSelector_OrbitCSVfilename, OrbitSelector_OrbitNetCDFfilename = OrbitSelector( PanelDisplayer.WIDGET_OrbitSelector_Filename.value, PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value, PanelDisplayer.WIDGET_OrbitSelector_TYP.value, PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value, PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value, PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value, PanelDisplayer.WIDGET_OrbitSelector_SC.value )
-	Display( '    OrbitSelector( ' , PanelDisplayer.WIDGET_OrbitSelector_Filename.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_EvtXY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_TYP.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_PerYYY.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_LatZZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SRXXHZ.value,', ' , PanelDisplayer.WIDGET_OrbitSelector_SC.value , ' ) results:')
-	Display( '          OrbitCSVfilename: ' + str(OrbitSelector_OrbitCSVfilename) )
-	Display( '          OrbitNetCDFfilename: ' + str(OrbitSelector_OrbitNetCDFfilename) )
-	Interpolator_InterpolatedOrbit = Interpolator( PanelDisplayer.WIDGET_Interpolator_ModelFile_forOrbit.value, OrbitSelector_OrbitNetCDFfilename )
-	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_ModelFile_forOrbit.value,', ' , OrbitSelector_OrbitNetCDFfilename , ' ) results:')
-	Display( '          InterpolatedOrbit: ' + str(Interpolator_InterpolatedOrbit) )
-	CreateNETCDFsphere_theSurfaceFilename = CreateNETCDFsphere( PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedDatetimeString.value, PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedAltitude.value, PanelDisplayer.WIDGET_CreateNETCDFsphere_LatitudeStep.value, PanelDisplayer.WIDGET_CreateNETCDFsphere_LongitudeStep.value )
-	Display( '    CreateNETCDFsphere( ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedDatetimeString.value,', ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_fixedAltitude.value,', ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_LatitudeStep.value,', ' , PanelDisplayer.WIDGET_CreateNETCDFsphere_LongitudeStep.value , ' ) results:')
-	Display( '          theSurfaceFilename: ' + str(CreateNETCDFsphere_theSurfaceFilename) )
-	Interpolator_InterpolatedSurface = Interpolator( PanelDisplayer.WIDGET_Interpolator_ModelFile_forSurface.value, CreateNETCDFsphere_theSurfaceFilename )
-	Display( '    Interpolator( ' , PanelDisplayer.WIDGET_Interpolator_ModelFile_forSurface.value,', ' , CreateNETCDFsphere_theSurfaceFilename , ' ) results:')
-	Display( '          InterpolatedSurface: ' + str(Interpolator_InterpolatedSurface) )
-	PlotGlobe( Interpolator_InterpolatedSurface, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, Interpolator_InterpolatedOrbit, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
-	Display( '    PlotGlobe( ' , Interpolator_InterpolatedSurface,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , Interpolator_InterpolatedOrbit,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
 	Display( '          -void-' )
 	Display('')
