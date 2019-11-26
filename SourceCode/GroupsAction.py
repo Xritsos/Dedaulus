@@ -58,7 +58,7 @@ from SourceCode.ModulesSourceCode.InstrumentEFI.InstrumentEFI import InstrumentE
 from SourceCode.ModulesSourceCode.InstrumentMIP.InstrumentMIP import InstrumentMIP
 from SourceCode.ModulesSourceCode.InstrumentMAG.InstrumentMAG import InstrumentMAG
 from SourceCode.ModulesSourceCode.InstrumentGNSS.InstrumentGNSS import InstrumentGNSS
-from SourceCode.ModulesSourceCode.DerivedProductsCalc .DerivedProductsCalc  import DerivedProductsCalc 
+from SourceCode.ModulesSourceCode.DerivedProductsCalc.DerivedProductsCalc import DerivedProductsCalc
 import SourceCode.PanelDisplayer as PanelDisplayer
 
 def Display( *arg ): # in order to avoid circular dependent imports
@@ -181,7 +181,7 @@ def Execute_IRI16():
 	Display('')
 """
 Executes these Simulation Modules:
-  OrbitSelector  Selector  Interpolator  SGV_vi  SGV_Ti  SGV_Te  SGV_Ni  SGV_nix  SGV_Ne  SGV_TEC  SGV_un  SGV_Tn  SGV_Nn  SGV_nnx  SGV_JEPP  SGV_B  SGV_E  WakeEffectsCalc  ChargingEffectsCalc  InstrumentIDMRPA  InstrumentTII  InstrumentRWSCWS  InstrumentIMS  InstrumentNMS  InstrumentACC  InstrumentEPDS3  InstrumentEFI  InstrumentMIP  InstrumentMAG  InstrumentGNSS  DerivedProductsCalc   
+  OrbitSelector  Selector  Interpolator  SGV_vi  SGV_Ti  SGV_Te  SGV_Ni  SGV_nix  SGV_Ne  SGV_TEC  SGV_un  SGV_Tn  SGV_Nn  SGV_nnx  SGV_JEPP  SGV_B  SGV_E  WakeEffectsCalc  ChargingEffectsCalc  InstrumentIDMRPA  InstrumentTII  InstrumentRWSCWS  InstrumentIMS  InstrumentNMS  InstrumentACC  InstrumentEPDS3  InstrumentEFI  InstrumentMIP  InstrumentMAG  InstrumentGNSS  DerivedProductsCalc  
 """
 def Execute_TopLevel():
 	Display('Executing TopLevel:')
@@ -275,9 +275,9 @@ def Execute_TopLevel():
 	InstrumentGNSS_ResultFilename = InstrumentGNSS( EnvToInsTrasnfer_ResultFilename )
 	Display( '    InstrumentGNSS( ' , EnvToInsTrasnfer_ResultFilename , ' ) results:')
 	Display( '          ResultFilename: ' + str(InstrumentGNSS_ResultFilename) )
-	DerivedProductsCalc _ResultFilename = DerivedProductsCalc ( InstrumentGNSS_ResultFilename )
-	Display( '    DerivedProductsCalc ( ' , InstrumentGNSS_ResultFilename , ' ) results:')
-	Display( '          ResultFilename: ' + str(DerivedProductsCalc _ResultFilename) )
+	DerivedProductsCalc_ResultFilename = DerivedProductsCalc( InstrumentGNSS_ResultFilename )
+	Display( '    DerivedProductsCalc( ' , InstrumentGNSS_ResultFilename , ' ) results:')
+	Display( '          ResultFilename: ' + str(DerivedProductsCalc_ResultFilename) )
 	Display('')
 """
 Executes these Simulation Modules:
