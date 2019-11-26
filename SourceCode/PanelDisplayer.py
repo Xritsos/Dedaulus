@@ -1397,7 +1397,7 @@ def Construct_TopLevel():
 		tooltip="",
 	)
 	DerivedProductsCalc_Btn.layout.min_width = '200px'
-	DerivedProductsCalc_Btn.style.button_color = 'IndianRed'
+	DerivedProductsCalc_Btn.style.button_color = 'Tomato'
 	TopLevel_Panel.children += (DerivedProductsCalc_Btn,)
 	# Create widgets for module's outputs
 	OutputsPanel = widgets.VBox()
