@@ -31,7 +31,7 @@ def MSISE00(file_to_read_full_path, parameter):
     input_path=os.path.dirname(file_to_read_full_path)
     #export_name=OnlyFilename+"_MSISE00_"+parameter+".csv"
     #export_name=os.path.dirname(file_to_read_full_path)+"/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_MSISE00_"+parameter+".csv"
-    export_name="../../NAS/Data_Files/ModelsOutput/MSISE/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_MSISE00_"+parameter+".csv"
+    export_name="../../../home/NAS/Data_Files/ModelOutputs/MSISE/"+os.path.splitext(os.path.basename(file_to_read_full_path))[0]+"_MSISE00_"+parameter+".csv"
     #export_name_Checkdir="SourceCode/ModulesSourceCode/Outputs/"+export_name
     export_name_Checkdir=export_name
 
