@@ -59,6 +59,7 @@ from SourceCode.ModulesSourceCode.InstrumentMIP.InstrumentMIP import InstrumentM
 from SourceCode.ModulesSourceCode.InstrumentMAG.InstrumentMAG import InstrumentMAG
 from SourceCode.ModulesSourceCode.InstrumentGNSS.InstrumentGNSS import InstrumentGNSS
 from SourceCode.ModulesSourceCode.DerivedProductsCalc.DerivedProductsCalc import DerivedProductsCalc
+from SourceCode.ModulesSourceCode.Test1.Test1 import Test1
 import SourceCode.PanelDisplayer as PanelDisplayer
 
 def Display( *arg ): # in order to avoid circular dependent imports
@@ -112,6 +113,16 @@ def Execute_Interpolator_NetCDF():
 	PlotGlobe( Interpolator_InterpolatedSurface, PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value, Interpolator_InterpolatedOrbit, PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value, PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value, PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value )
 	Display( '    PlotGlobe( ' , Interpolator_InterpolatedSurface,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_SurfaceColorscaleName.value,', ' , Interpolator_InterpolatedOrbit,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitVariableToPlot.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorbarTitle.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_OrbitColorscaleName.value,', ' , PanelDisplayer.WIDGET_PlotGlobe_PlotTitle.value , ' ) results:')
 	Display( '          -void-' )
+	Display('')
+"""
+Executes these Simulation Modules:
+  Test1  
+"""
+def Execute_ExecuteTest1():
+	Display('Executing ExecuteTest1:')
+	Test1_txt = Test1(  )
+	Display( '    Test1() results:')
+	Display( '          txt: ' + str(Test1_txt) )
 	Display('')
 """
 Executes these Simulation Modules:
