@@ -336,7 +336,7 @@ def CalculateAltitudeFromData( SurfaceFilename ):
         try:
             result = CDFroot.variables["altitude"][0]
         except:
-            result=0 
+            result=0 # TODO: convert pressure levels to altitude
         if result==0: 
             result = 2
         CDFroot.close()

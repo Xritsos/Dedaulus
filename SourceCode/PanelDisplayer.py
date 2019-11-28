@@ -506,6 +506,39 @@ def Construct_Interpolator_NetCDF():
 	return Interpolator_NetCDF_Panel
 
 
+def Construct_ExecuteTest1():
+	#Create Containers
+	ExecuteTest1_Panel = widgets.Box()
+	ExecuteTest1_Panel.layout.overflow_x = 'scroll'
+	ExecuteTest1_Panel.layout.flex_flow = 'row'
+	ExecuteTest1_Panel.layout.display = 'flex'
+	########
+	## GUI code for module 'Test1'
+	########
+	# Create widgets for module's inputs
+	InputsPanel = widgets.VBox()
+	InputsPanel.layout.min_width = '330px'
+	ExecuteTest1_Panel.children += (InputsPanel,)
+	# Create widget for the moudle black-box body
+	Test1_Btn = widgets.Button (
+		description='Test1',
+		tooltip="",
+	)
+	Test1_Btn.layout.min_width = '200px'
+	Test1_Btn.style.button_color = 'gold'
+	ExecuteTest1_Panel.children += (Test1_Btn,)
+	# Create widgets for module's outputs
+	OutputsPanel = widgets.VBox()
+	OutputsPanel.layout.min_width = '300px'
+	WIDGET_Test1_txt = widgets.Label(value='  --> txt  ')
+	WIDGET_Test1_txt.layout.border = '1px dashed green'
+	WIDGET_Test1_txt.layout.margin ='0px 40px 0px 0px' 
+	WIDGET_Test1_txt.layout.padding ='0px 10px 0px 10px' 
+	OutputsPanel.children += (WIDGET_Test1_txt,)
+	ExecuteTest1_Panel.children += (OutputsPanel,)
+	return ExecuteTest1_Panel
+
+
 def Construct_HWM14():
 	#Create Containers
 	HWM14_Panel = widgets.Box()
