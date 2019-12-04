@@ -10,6 +10,14 @@ We can add these plot types to Plotables:
     'mesh3d', 'ohlc', 'parcats', 'parcoords', 'pie', 'pointcloud', 'sankey', 'scatter', 'scatter3d', 'scattercarpet', 
     'scattergeo','scattergl', 'scattermapbox', 'scatterpolar','scatterpolargl', 'scatterternary', 'splom', 'streamtube', 
     'sunburst', 'surface', 'table', 'violin', 'volume', 'waterfall'
+Plotly colorscale names:
+    'aggrnyl', 'agsunset', 'algae', 'amp', 'armyrose', 'balance', 'blackbody', 'bluered', 'blues', 'blugrn', 'bluyl', 'brbg',
+    'brwnyl', 'bugn', 'bupu', 'burg', 'burgyl', 'cividis', 'curl', 'darkmint', 'deep', 'delta', 'dense', 'earth', 'edge', 'electric',
+    'emrld', 'fall', 'geyser', 'gnbu', 'gray', 'greens', 'greys', 'haline', 'hot', 'hsv', 'ice', 'icefire', 'inferno', 'jet',
+    'magenta', 'magma', 'matter', 'mint', 'mrybm', 'mygbm', 'oranges', 'orrd', 'oryel', 'peach', 'phase', 'picnic', 'pinkyl', 'piyg',
+    'plasma', 'plotly3', 'portland', 'prgn', 'pubu', 'pubugn', 'puor', 'purd', 'purp', 'purples', 'purpor', 'rainbow', 'rdbu', 'rdgy',
+    'rdpu', 'rdylbu', 'rdylgn', 'redor', 'reds', 'solar', 'spectral', 'speed', 'sunset', 'sunsetdark', 'teal', 'tealgrn', 'tealrose',
+    'tempo', 'temps', 'thermal', 'tropic', 'turbid', 'twilight', 'viridis', 'ylgn', 'ylgnbu', 'ylorbr', 'ylorrd'
 
 '''
 
@@ -25,8 +33,12 @@ import math
 from scipy.io import netcdf  
 from mpl_toolkits.basemap import Basemap
 import warnings
+import random
 
 EarthRadius = 6378.137 # km - global, its value will not change through out the code
+#EarthCircumference = 40007.863 # km
+pi = 3.14159265359
+
 LatStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 LonStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 theSurfaceOpacity = 0.90
@@ -36,6 +48,7 @@ def degree2radians(degree):
     return degree*pi/180
 
 # from plot.ly - maps the points of coords (lon, lat) to points onto the sphere of radius radius
+
 def mapping_map_to_sphere(lon, lat, radius=1):  
     lon=np.array(lon, dtype=np.float64)
     lat=np.array(lat, dtype=np.float64)
@@ -45,6 +58,42 @@ def mapping_map_to_sphere(lon, lat, radius=1):
     ys=radius*sin(lon)*cos(lat)
     zs=radius*sin(lat)
     return xs, ys, zs
+
+def mapping_map_to_sphere_Azimuthal_equidistant_projection(lon, lat, radius=1):  
+    lon=np.array(lon, dtype=np.float64)
+    lat=np.array(lat, dtype=np.float64)
+    lon=degree2radians(lon)
+    lat=degree2radians(lat)
+    Ro    = radius * ( pi/2 - lat )
+    Theta = lon
+    xs=Ro*cos(Theta)
+    ys=Ro*sin(Theta)
+    zs=radius*sin(lat)
+    return xs, ys, zs
+
+
+def mapping_map_to_blob(lon, lat, radius):  
+    lon=np.array(lon, dtype=np.float64)
+    lat=np.array(lat, dtype=np.float64)
+    lon=degree2radians(lon)
+    lat=degree2radians(lat)
+    
+    xs=radius*cos(lon)*cos(lat)
+    ys=radius*sin(lon)*cos(lat)
+    zs=radius*sin(lat)
+    
+    '''
+    xs = np.zeros( lon.shape )
+    ys = np.zeros( lon.shape )
+    zs = np.zeros( lon.shape )
+    for i in range(len(lon)):
+        for j in range(len(lon[i])):
+            xs[i][j] = (1+cos(lat[i][j]/5)/2)* radius*cos(lon[i][j])*cos(lat[i][j])
+            ys[i][j] = (1+cos(lat[i][j]/5)/2)* radius*sin(lon[i][j])*cos(lat[i][j])
+            zs[i][j] = (1+cos(lat[i][j]**2))* radius*sin(lat[i][j])
+    '''
+    return xs, ys, zs
+
 
 # Make shortcut to Basemap object, not specifying projection type
 m = Basemap() 
@@ -108,7 +157,7 @@ ARGUMENTS:
   PlotTitle: A title which is displayed on the top of the plot.
 RETURNS: a string containing information about the Data
 '''
-def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, SurfaceColorscaleName, OrbitFilename, OrbitVariableToPlot, OrbitColorbarTitle, OrbitColorscaleName, PlotTitle, VectorsFilename="", VectorsVariableToPlot="", VectorsColorbarTitle="", VectorsColorscaleName="Jet", SurfaceOpacity=0.90 ):
+def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, SurfaceColorscaleName, OrbitFilename, OrbitVariableToPlot, OrbitColorbarTitle, OrbitColorscaleName, PlotTitle, VectorsFilename="", VectorsVariablesToPlot="", VectorsColorbarTitle="", VectorsColorscaleName="Jet", SurfaceOpacity=0.90, LogScale=False ):
     result = ""
     startSecs = time.time()
 
@@ -118,7 +167,7 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     
     # define colorscales for ploting
     colorscaleWhite=[[0.0, '#ffffff'], [1.0, '#ffffff']]
-    colorscaleBlack=[[0.0, '#000000'], [1.0, '#000000']]
+    colorscaleBlack=[[0.0, '#666666'], [1.0, '#666666']]
     if SurfaceColorscaleName is None:
         SurfaceColorscaleName = colorscaleBlack
     elif len( SurfaceColorscaleName ) == 0: 
@@ -127,6 +176,10 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
         OrbitColorscaleName = colorscaleBlack
     elif len( OrbitColorscaleName ) == 0: 
         OrbitColorscaleName=[[0.0, '#313695'], [0.07692307692307693, '#3a67af'], [0.15384615384615385, '#5994c5'], [0.23076923076923078, '#84bbd8'], [0.3076923076923077, '#afdbea'], [0.38461538461538464, '#d8eff5'], [0.46153846153846156, '#d6ffe1'], [0.5384615384615384, '#fef4ac'], [0.6153846153846154, '#fed987'], [0.6923076923076923, '#fdb264'], [0.7692307692307693, '#f78249'], [0.8461538461538461, '#e75435'], [0.9230769230769231, '#cc2727'], [1.0, '#a50026']]
+    if VectorsColorscaleName is None:
+        VectorsColorscaleName = colorscaleBlack
+    elif len( VectorsColorscaleName ) == 0: 
+        VectorsColorscaleName=[[0.0, '#313695'], [0.07692307692307693, '#3a67af'], [0.15384615384615385, '#5994c5'], [0.23076923076923078, '#84bbd8'], [0.3076923076923077, '#afdbea'], [0.38461538461538464, '#d8eff5'], [0.46153846153846156, '#d6ffe1'], [0.5384615384615384, '#fef4ac'], [0.6153846153846154, '#fed987'], [0.6923076923076923, '#fdb264'], [0.7692307692307693, '#f78249'], [0.8461538461538461, '#e75435'], [0.9230769230769231, '#cc2727'], [1.0, '#a50026']]
         
         
     #### create the earth surface
@@ -165,9 +218,10 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     # define the layout of the plot
     theLayout = dict(
         title = PlotTitle,
-        width=1000, height=800,
+        width=1200, height=1000,
         scene = dict(
             xaxis = dict( zeroline=False ), yaxis = dict( zeroline=False ), zaxis = dict( zeroline=False ),
+            #xaxis_type="log", yaxis_type="log", zaxis_type="log",
             aspectratio=dict(x=1, y=1,z=1), camera=dict(eye=dict(x=1.20, y=1.20, z=1.20))
         )
     )
@@ -179,11 +233,30 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     #### read the Data file into an Array
     if len(SurfaceFilename) > 0:
         SurfaceData =  SurfaceFile_to_array( SurfaceFilename, SurfaceVariableToPlot ) 
+        if LogScale:
+            for i in range(len(SurfaceData)):
+                for j in range(len(SurfaceData[i])):
+                    if SurfaceData[i][j] == 0:
+                        SurfaceData[i][j] = SurfaceData[i][j]
+                    elif SurfaceData[i][j] > 0:
+                        SurfaceData[i][j] = math.log( SurfaceData[i][j], 10 )
+                    else:
+                        SurfaceData[i][j] = -1 * math.log( abs(SurfaceData[i][j]), 10 ) 
+
     else:
         SurfaceData = None
     
     #### read the Orbit Data file into an Array
-    OrbitData =  OrbitFile_to_array( OrbitFilename, OrbitVariableToPlot) 
+    OrbitData =  OrbitFile_to_array( OrbitFilename, OrbitVariableToPlot )
+    if LogScale  and  (OrbitData is not None):
+        for i in range(len(OrbitData)):
+            if OrbitData[i][3] == 0:
+                OrbitData[i][3] = OrbitData[i][3]
+            elif OrbitData[i][3] > 0:
+                OrbitData[i][3] = math.log( OrbitData[i][3], 10 )
+            else:
+                OrbitData[i][3] = -1 * math.log( abs(OrbitData[i][3]), 10 )
+
    
 
     #### Calculate min / max values of all plotable data 
@@ -223,20 +296,24 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
         VectorZ = list()
         latidx = 0
         lonidx = 0
+        # parse variable names as given by user
+        varXname, varYname, varZname = VectorsVariablesToPlot.split( ",", 2 )
         # open NectCDF file and read the variables
         CDFroot = Dataset( VectorsFilename, 'r' )        
         for i in np.arange(-88.75, 90, 2.5): # for i in np.arange(87.5, -92.5, -5.0):
             lonidx = 0
-            N = EarthRadius
+            a = 6378137; 
+            e = 2.71828;
+            aLat = degree2radians( i )
+            N = EarthRadius #N = EarthRadius / math.sqrt(abs(1 - e*e * math.sin(aLat)*math.sin(aLat)));
             for j in np.arange(-180.0,  177.5, 2.5): # for j in np.arange(-180.0,  180.0, 5.0):
-                aLat = degree2radians( i )
                 aLon = degree2radians( j )
-                V_Lats.append( (N+100) * math.cos(aLat) * math.cos(aLon) )
-                V_Lons.append( (N+100) * math.cos(aLat) * math.sin(aLon) )
-                V_Alts.append( (N+100) * math.sin(aLat) )
-                VectorX.append( CDFroot.variables[VectorsVariableToPlot+"x"][1,0,latidx,lonidx] )
-                VectorY.append( CDFroot.variables[VectorsVariableToPlot+"y"][1,0,latidx,lonidx] )
-                VectorZ.append( CDFroot.variables[VectorsVariableToPlot+"z"][1,0,latidx,lonidx] )
+                V_Lats.append( (N+300) * math.cos(aLat) * math.cos(aLon) )
+                V_Lons.append( (N+300) * math.cos(aLat) * math.sin(aLon) )
+                V_Alts.append( (N+300) * math.sin(aLat) ) # V_Alts.append( ((1-e*e)*N+500) * math.sin(aLat) )
+                VectorX.append( CDFroot.variables[varXname][1,0,latidx,lonidx] )
+                VectorY.append( CDFroot.variables[varYname][1,0,latidx,lonidx] )
+                VectorZ.append( CDFroot.variables[varZname][1,0,latidx,lonidx] )
                 lonidx = lonidx + 1
             latidx = latidx + 1
         CDFroot.close()
@@ -248,52 +325,48 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
         #np.set_printoptions(suppress=False)
         #np.set_printoptions(precision=12)
         
+        # throw away some cones so that the plot becomes more clear
+        #step = 3
+        #V_Lats  = V_Lats[::step]
+        #V_Lons  = V_Lons[::step]
+        #V_Alts  = V_Alts[::step]
+        #VectorX = VectorX[::step]
+        #VectorY = VectorY[::step]
+        #VectorZ = VectorZ[::step]
+        
+        if LogScale:
+            for i in range(len(VectorX)):
+                if VectorX[i] == 0:
+                    VectorX[i] = VectorX[i]
+                elif VectorX[i] > 0:
+                    VectorX[i] = math.log( VectorX[i], 10 )
+                else:
+                    VectorX[i] = -1 * math.log( abs(VectorX[i]), 10 ) 
+            for i in range(len(VectorY)):
+                if VectorY[i] == 0:
+                    VectorY[i] = VectorY[i]
+                elif VectorY[i] > 0:
+                    VectorY[i] = math.log( VectorY[i], 10 )
+                else:
+                    VectorX[i] = -1 * math.log( abs(VectorX[i]), 10 ) 
+            for i in range(len(VectorZ)):
+                if VectorZ[i] == 0:
+                    VectorZ[i] = VectorZ[i]
+                elif VectorZ[i] > 0:
+                    VectorZ[i] = math.log( VectorZ[i], 10 )
+                else:
+                    VectorZ[i] = -1 * math.log( abs(VectorZ[i]), 10 ) 
+                    
+
+        
         VectorCones = dict(type='cone',
               x=V_Lats,  y=V_Lons,  z=V_Alts,
               u=VectorX, v=VectorY, w=VectorZ,
-              sizemode='scaled', sizeref=45,
+              sizemode='scaled', sizeref=44,
               colorscale=VectorsColorscaleName, anchor='tip',
               colorbar=dict(thickness=20, len=0.75, ticklen=4, title=dict(text=VectorsColorbarTitle,side="top"), xanchor="center", x=0) 
         )
         
-        '''
-        Test: display seminal citiies
-        n=0
-        for i in np.arange(-88.75, 90, 2.5):
-            for j in np.arange(-180.0,  177.5, 2.5):
-                break
-                n=n+1
-                if i==1.25 and j==0:
-                    print("zero ", Ex[n], Ey[n], Ez[n])
-                    Ex[n] = 10
-                    Ey[n] = 10
-                    Ez[n] = 10
-                if i==41.25 and j==-75:
-                    print("NY", Ex[n], Ey[n], Ez[n])
-                    Ex[n] = 10
-                    Ey[n] = 10
-                    Ez[n] = 10
-                if i==38.75 and j==25:
-                    print("Athens", Ex[n], Ey[n], Ez[n])
-                    Ex[n] = 10
-                    Ey[n] = 10
-                    Ez[n] = 10
-                if i==38.75 and j==140:
-                    print("Tokyo", Ex[n], Ey[n], Ez[n])
-                    Ex[n] = 10
-                    Ey[n] = 10
-                    Ez[n] = 10
-                if i==-33.75 and j==-70:
-                    print("Santiago", Ex[n], Ey[n], Ez[n])
-                    Ex[n] = 10
-                    Ey[n] = 10
-                    Ez[n] = 10
-                if i==-33.75 and j==150:
-                    print("Sydney", Ex[n], Ey[n], Ez[n])
-                    Ex[n] = 10
-                    Ey[n] = 10
-                    Ez[n] = 10                    
-        '''
         #VectorCones = dict( type = "scatter3d", mode = "markers", x = V_Lats,  y = V_Lons,  z = V_Alts, showlegend = False, marker = dict(  size=3, color = Ex, colorscale = "Jet",  ),  )
         
         Plotables.append( VectorCones )
@@ -301,15 +374,174 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
 
     fig = dict( data=Plotables, layout=theLayout )
     # plot all
+    # ZORO UNCOMMENT:
     plotly.offline.init_notebook_mode(connected=True)
     plotly.offline.iplot(fig)
     
     finishSecs = time.time()
     # be verbose
     #result = result + "Lon shape: " + str(lon.shape) + "  Lat shape: " + str(lat.shape) + "  Data shape: " + str(Data.shape) + "\n"
-    if len(SurfaceFilename) > 0: result = result + "Data Min: " + str(SurfaceMin) + "  Data Max: " + str(SurfaceMax) + "\n"
+    if len(SurfaceFilename) > 0: result = result + "Surface Min: " + str(SurfaceMin) + "  Surface Max: " + str(SurfaceMax) + "\n"
     if len(OrbitFilename) > 0: result = result + "Orbit Min: " + str(OrbitMin) + "  Orbit Max: " + str(OrbitMax) + "\n"
     if len(OrbitFilename) > 0: result = result + "Number of Orbit positions: "  + str(len(OrbitData)) + "\n"    
+        
+        
+    ########### Plot a Polar Chart of the surface-data and  orbit-data ()                 ###########
+    ########### infor from https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection ###########
+    PolarPlotables = list()
+
+    # for the Surface
+    if len(SurfaceFilename) > 0:
+        SurfacePolarColors = SurfaceData.flatten()
+        LATs = list()
+        LONs = list()
+        all_lats = np.arange(   -88.5,  87.5,  LatStep )
+        all_lons = np.arange( -180.0,  180.0,  LonStep )
+        for i in range( len(all_lats) ):
+            for j in range( len(all_lons) ):
+                LATs.append( all_lats[i] )
+                LONs.append( all_lons[j] )
+        Surface_Lats = np.array( LATs , dtype=np.float64)
+        Surface_Lons = np.array( LONs , dtype=np.float64)
+        Surface_Ro    = np.zeros( len(Surface_Lons) )
+        Surface_Theta = np.zeros( len(Surface_Lons) )
+        for i in range( len( Surface_Lons ) ):
+            Surface_Ro[i]    = ( pi/2 - Surface_Lats[i] )
+            Surface_Theta[i] = Surface_Lons[i] - 90
+            #if  Surface_Lats[i]+33.75<5  and  Surface_Lons[i]+70<5:
+            #    SurfacePolarColors[i] = 1000
+            #    SurfaceMax = 1000
+        SurfacePolarScatter = dict( 
+            type = "scatterpolar", mode = "markers", 
+            r = Surface_Ro,  theta = Surface_Theta,
+            marker = dict( size=10, color = SurfacePolarColors, colorscale=SurfaceColorscaleName, opacity = 0.80, 
+                          cmin = SurfaceMin, cmax = SurfaceMax,
+                colorbar=dict(thickness=20, len=0.75, ticklen=4, title=dict(text=SurfaceColorbarTitle,side="top"), xanchor="center", x=0) # x must be between [-2, 3]
+            ),
+        ) 
+        
+        #PolarPlotables.append( SurfacePolarScatter )
+
+        PolarPlotables.append( CreatePlotable_PolarSurface (SurfaceData, SurfaceMin, SurfaceMax, SurfaceColorscaleName, SurfaceColorbarTitle) )
+    
+    # for theEarth
+    if len(SurfaceFilename) > 0  or  len(OrbitFilename) > 0 :
+        Boundaries_Ro    = np.zeros( len(boundaries_lons) )
+        Boundaries_Theta = np.zeros( len(boundaries_lons) )
+        for i in range( len( boundaries_lons ) ):
+            if boundaries_lats[i] is None:
+                Boundaries_Ro[i] = 0
+            else:
+                Boundaries_Ro[i]    = ( pi/2 - boundaries_lats[i] )
+            if boundaries_lons[i] is None:
+                Boundaries_Theta[i] = 0
+            else:
+                Boundaries_Theta[i] = boundaries_lons[i] - 90
+        
+        # Get list of of coastline, country, and state lon/lat and concatenate them 
+        coastline_lons, coastline_lats = get_coastline_traces()
+        country_lons, country_lats = get_country_traces()   
+        boundaries_lons = coastline_lons+[None]+country_lons
+        boundaries_lats = coastline_lats+[None]+country_lats
+        # keep only 60-90 degrees
+        for i in range( len(boundaries_lats) ):
+            if (boundaries_lats[i] is not None) and boundaries_lats[i] < 55:
+                boundaries_lats[i] = None
+        # adjust latitudes for polar plot
+        for i in range( len(boundaries_lats) ):
+            if boundaries_lats[i] is None:
+                boundaries_lats[i] = None
+            elif boundaries_lats[i] >= 0:
+                boundaries_lats[i] = 45 + boundaries_lats[i] / 2
+            elif boundaries_lats[i] < 0:
+                boundaries_lats[i] = 45 + boundaries_lats[i]/2
+        boundaries_dataX, boundaries_dataY, boundaries_dataZ = mapping_map_to_sphere_Azimuthal_equidistant_projection(boundaries_lons, boundaries_lats, radius=EarthRadius)
+                
+        XXX = boundaries_dataX 
+        YYY = boundaries_dataY 
+        ZZZ = np.zeros(len(boundaries_dataZ))
+            
+        BoundariesPolarScatter3D = dict( 
+            type = "scatter3d", mode = "lines", opacity = 1, showlegend=False, marker = dict( size=2, color="black"),
+            x=XXX, y=YYY, z=ZZZ,
+        )          
+        PolarPlotables.append( BoundariesPolarScatter3D )
+    
+    # for the lines
+    if len(SurfaceFilename) > 0:    
+        line_lons = np.arange(-180, 190, 10).tolist()
+        line_lats = np.full( len(line_lons), 0 ).tolist()
+        for i in range( 0, int(EarthRadius/6), int(EarthRadius/18) ):
+            LinesX, LinesY, LinesZ = mapping_map_to_sphere_Azimuthal_equidistant_projection( line_lons, line_lats, radius=i )
+            LinesZ = np.zeros( LinesZ.shape )
+            Lines = dict( 
+                type = "scatter3d", mode = "lines", opacity = 0.7, marker = dict( size=2, color="gray"), showlegend=False,
+                x=LinesX, y=LinesY, z=LinesZ,
+            )
+            PolarPlotables.append( Lines )
+        ## add a label for each line indicating the latitude number
+        XXXXX = np.arange( 140+555, 2000, 555 )
+        print( XXXXX )
+        labels = dict( 
+            type = "scatter3d", mode = "text", opacity = 0.7, showlegend=False,
+            x=XXXXX, y=[0,0,0], z=[0,0,0], text=["80", "70", "60"],
+        )
+        PolarPlotables.append( labels )
+            
+    # for the Orbit  
+    if len(OrbitFilename) > 0: 
+        Orbit_Lats  = OrbitData[:,0]
+        Orbit_Lons  = OrbitData[:,1]
+        # keep only 60-90 degrees
+        for i in range( len(Orbit_Lats) ):
+            if Orbit_Lats[i] < 55:
+                Orbit_Lats[i] = None
+        for i in range( len(Orbit_Lats) ):
+            if Orbit_Lats[i] is None:
+                Orbit_Lats[i] = None
+            elif Orbit_Lats[i] >= 0:
+                Orbit_Lats[i] = 45 + Orbit_Lats[i] / 2
+            elif Orbit_Lats[i] < 0:
+                Orbit_Lats[i] = 45 + Orbit_Lats[i]/2
+
+        XXX, YYY, ZZZ = mapping_map_to_sphere_Azimuthal_equidistant_projection(Orbit_Lons, Orbit_Lats, radius=EarthRadius)
+        ZZZ = np.zeros(len(ZZZ))
+        OrbitPolarScatter3D = dict(
+            type = "scatter3d", mode = "markers", opacity = 1, showlegend=False, x=XXX, y=YYY, z=ZZZ,
+            marker = dict( size=2, color=OrbitData[:,2], cmin = OrbitMin, cmax = OrbitMax, colorscale=OrbitColorscaleName,
+                colorbar=dict(thickness=20, len=0.75, ticklen=4, title=dict(text=OrbitColorbarTitle,side="top"), xanchor="center", x=0) # x must be between [-2, 3]                          
+            ),
+        )          
+        PolarPlotables.append( OrbitPolarScatter3D )
+    
+    # for the Orbit
+    '''
+    if len(OrbitFilename) > 0:    
+        Orbit_Lats  = OrbitData[:,0]
+        Orbit_Lons  = OrbitData[:,1]
+        Orbit_Ro    = np.zeros( len(Orbit_Lats) )
+        Orbit_Theta = np.zeros( len(Orbit_Lats) )
+        OrbitPolarColors = OrbitData[:,2]
+        for i in range( len( OrbitData ) ):
+            Orbit_Ro[i]    = ( pi/2 - Orbit_Lats[i] )
+            Orbit_Theta[i] = Orbit_Lons[i] - 90
+        OrbitPolarScatter = dict( 
+            type = "scatterpolar", mode = "markers", 
+            r = Orbit_Ro,  theta = Orbit_Theta,
+            marker = dict( size=4, color = OrbitPolarColors, colorscale = "Jet", opacity = 0.80, 
+                          cmin = OrbitMin, cmax = OrbitMax,
+                colorbar=dict(thickness=20, len=0.75, ticklen=4, title=dict(text=SurfaceColorbarTitle,side="top"), xanchor="center", x=0) # x must be between [-2, 3]
+            ),
+        )
+        #PolarPlotables.append( OrbitPolarScatter )
+    '''
+        
+    #### Plot the polar charts 
+    if len(PolarPlotables) > 0:
+        fig = dict( data=PolarPlotables, layout=theLayout )
+        plotly.offline.init_notebook_mode(connected=True)
+        plotly.offline.iplot(fig)
+        
     result = result + "Plot creation duration: " + str(finishSecs-startSecs) + " seconds.\n"
     return result;
 
@@ -392,8 +624,8 @@ def CalculateLatLonSteps( SurfaceFilename ):
             Lons = CDFroot.variables["lon"][:]
             theLonStep = abs( Lons[0] - Lons[1] )
         CDFroot.close()
-        theLatStep = 5 # zoro  # TODO explain or correct
-        theLonStep = 5 # zoro  # TODO explain or correct
+        theLatStep = 5 # TODO explain or correct
+        theLonStep = 5 # TODO explain or correct
     return theLatStep, theLonStep
 
 
@@ -523,7 +755,10 @@ def CreatePlotable_Surface( Data, Altitude, MinValue, MaxValue , ColorScale, Col
     clats = np.array( [90] + lat.tolist() + [-90] , dtype=np.float64)
     clons, clats=np.meshgrid(clons, clats)
     # Map the meshgrids clons, clats onto the sphere
-    XS, YS, ZS = mapping_map_to_sphere(clons, clats, radius=EarthRadius+Altitude)
+    if isinstance(Altitude, np.ndarray): 
+        XS, YS, ZS = mapping_map_to_blob(clons, clats, Altitude)
+    else:
+        XS, YS, ZS = mapping_map_to_sphere(clons, clats, radius=EarthRadius+Altitude)
     # for color continuity
     nrows, ncolumns=clons.shape
     DATA = np.zeros(clons.shape, dtype=np.float64)
@@ -542,6 +777,84 @@ def CreatePlotable_Surface( Data, Altitude, MinValue, MaxValue , ColorScale, Col
     
 
 ###########################################################################################################
+
+def CreatePlotable_PolarSurface( Data, MinValue, MaxValue, ColorScale, ColorbarTitle):
+    # construct the values for longitude and latitude
+    global LatStep
+    global LonStep
+    lat = np.arange(   87.5,  -88.5,  -LatStep ) # lat = np.arange(   87.5,  -88.5,  int(-180 / len(Data   ) ) )
+    lon = np.arange( -180.0,  180.0,   LonStep ) # lon = np.arange( -180.0,  180.0,  int( 360 / len(Data[0]) ) ) 
+    
+    #### SHIFTING
+    # Shift 'lon' from [0,360] to [-180,180]
+    tmp_lon = np.array([lon[n]-360 if l>=180 else lon[n] for n,l in enumerate(lon)])  # => [0,180]U[-180,2.5]
+    i_east, = np.where(tmp_lon>=0)  # indices of east lon
+    i_west, = np.where(tmp_lon<0)   # indices of west lon
+    lon = np.hstack((tmp_lon[i_west], tmp_lon[i_east]))  # stack the 2 halves
+    # Correspondingly, shift the Data array
+    Data_ground = np.array(Data)
+    try:  # TODO explain or correct
+        Data = np.hstack((Data_ground[:,i_west], Data_ground[:,i_east]))
+    except:
+        print( "Data NOT shifted." )
+    
+    # cut out a pizza slice
+    #for i in range (0,16):
+    #    for j in range (0,16):
+    #        Data[i,j] = float('nan')
+    
+    # To ensure color continuity we extend the lon list with [180] (its last value was lon[-1]=177.5). In this way we can identify lon=-180 with lon=180.
+    # We do the same with latitudes. We extend both directions with [90] and [-90] in order to have values for the poles.
+    clons = np.array( lon.tolist() + [180]        , dtype=np.float64)
+    clats = np.array( [90] + lat.tolist() + [-90] , dtype=np.float64)
+    
+
+    # keep only 60-90 degrees
+    for i in range( len(clats) ):
+        if clats[i] < 55:
+            clats[i] = None
+    # manipulate for polar plot    
+    for i in range( len(clats) ):
+        if clats[i] is None:
+            clats[i] = None
+        elif clats[i] >= 0:
+            clats[i] = 45 + clats[i] / 2
+        elif clats[i] < 0:
+            clats[i] = 45 + clats[i]/2
+            
+
+    # create 2d mesh from the 1D lats and lons
+    clons, clats = np.meshgrid(clons, clats)            
+            
+    # Map the meshgrids clons, clats onto the sphere
+    XS, YS, ZS = mapping_map_to_sphere_Azimuthal_equidistant_projection(clons, clats, radius=EarthRadius)
+    ZS = np.full( ZS.shape, 0 )
+            
+    # for color continuity
+    nrows, ncolumns=clons.shape
+    DATA = np.zeros(clons.shape, dtype=np.float64)
+    DATA[1:nrows-1, :ncolumns-1] = np.copy(np.array(Data,  dtype=np.float64)) # ignore the extended values
+    DATA[1:nrows-1,  ncolumns-1] = np.copy(Data[:, 0]) # ignore the extended values
+    
+    # flatten to polar plain
+    ##ZS = np.full( ZS.shape, 0 )
+    # Create the mesh in polar coordinates and compute corresponding Z.
+    ##r = np.linspace(0, 90, 73) #r = np.linspace(0, 90, 73)
+    ##p = np.linspace(-np.pi, np.pi, 39) # p = np.linspace(0, 2*np.pi, 38)
+    ##R, P = np.meshgrid(r, p)
+    # Express the mesh in the cartesian system.
+    ##XS, YS = R*np.cos(P), R*np.sin(P)
+    
+    # Create a polar surface colored in accordance with the data
+    DataSphere=dict(type='surface', x = XS,  y = YS,  z = ZS,
+        colorscale = ColorScale, surfacecolor = DATA, opacity = 0.9,
+        cmin = MinValue, cmax = MaxValue,
+        colorbar=dict(thickness=20, len=0.75, ticklen=4, title=ColorbarTitle),
+    )
+    #if len(ColorbarTitle) == 0 : DataSphere["showscale"] = False
+
+    return DataSphere
+
 
 
 # Creates a dictionary containing all information needed to Plotly in order to plot a spherical surface around the earth
@@ -572,3 +885,25 @@ def CreatePlotable_Orbit( OrbitData, MinValue, MaxValue, ColorScale, ColorbarTit
     return OrbitScatter
 
 
+
+
+
+'''
+18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+    lat = np.arange(   87.5,  -88.5, -LatStep ) 36
+    lon = np.arange( -180.0,  180.0,  LonStep ) 72
+
+FOR TESTING
+Place		Lat	Lon
+---------------------------
+Zero Point	0		0			SurfaceData[18][36] = 50000 # Zero Point
+Sydney 		-34		151			SurfaceData[22][66] = 50000 # Sydney
+Santiago	-33		-70			SurfaceData[24][22] = 50000 # Santiago
+Tokyo		35		140			SurfaceData[10][64] = 50000 # Tokyo
+NY			41.25	-75			SurfaceData[9][21] = 50000 # NY
+Athens		38		23			SurfaceData[10][40] = 50000 # Athens
+'''
+
+
+
+        
