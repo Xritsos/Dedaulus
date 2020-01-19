@@ -37,11 +37,17 @@ import random
 
 EarthRadius = 6378.137 # km - global, its value will not change through out the code
 #EarthCircumference = 40007.863 # km
-pi = 3.14159265359
+#pi = 3.14159265359
 
 LatStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 LonStep  =  5 # global - its value will change after parsing the surface file. It will be declared as global inside the fnctions.
 theSurfaceOpacity = 0.90
+
+theSurfaceTimestep      = 1 # the timestep where the surface data to be plotted belong. This is parameter of the NetCDF file.
+theSurfacePressureLevel = 0 # the pressure level where the surface data to be plotted belong. This is parameter of the NetCDF file.
+theVectorsTimestep      = 1 # the timestep where the vector data to be plotted belong. This is parameter of the NetCDF file.
+theVectorsPressureLevel = 0 # the pressure level where the vector data to be plotted belong. This is parameter of the NetCDF file.
+
 
 # from plot.ly - convert degrees to radians
 def degree2radians(degree):    
@@ -78,6 +84,7 @@ def mapping_map_to_blob(lon, lat, radius):
     lon=degree2radians(lon)
     lat=degree2radians(lat)
     
+    print( ">>> ", radius.shape, lon.shape, lat.shape )
     xs=radius*cos(lon)*cos(lat)
     ys=radius*sin(lon)*cos(lat)
     zs=radius*sin(lat)
@@ -142,24 +149,51 @@ The same or different colorscales can be selected for the surface and the orbit.
 The same or different value range can be selected for the surface and the orbit by assigning the same or different colorbar titles.
 Valid Colorscale Names: ‘Blackbody’, ‘Bluered’, ‘Blues’, ‘Earth’, ‘Electric’, ‘Greens’, ‘Greys’, ‘Hot’, ‘Jet’, ‘Picnic’, ‘Portland’, ‘Rainbow’, ‘RdBu’, ‘Reds’, ‘Viridis’, ‘YlGnBu’, ‘YlOrRd’
 ARGUMENTS:
-  SurfaceFilename: The file which contains data for a surface. If empty string then no surface will be plotted. 
-                   CSV format: Time,Lat,Lon,Alt,value. Contains the data for the sphere surface. 
-                   NetCDF format: see Daedalus User Manual
-  SurfaceVariableToPlot: The name of the variable to read from the surface data file and plot upon the globe.
-  SurfaceColorbarTitle: A title to display above the colorbar which refers to the surface data
-  SurfaceColorscaleName: The name of the Colorscale to use for the surface data. 
-                         In case an empty string is passed then a default HeatMap colorscale will be applied.
-                         In case None is passed then all points will be black irrespective of value.
-  OrbitFilename: counterpart of the corresponding argument for the Surface data
-  OrbitVariableToPlot: counterpart of the corresponding argument for the Surface data 
-  OrbitColorbarTitle: counterpart of the corresponding argument for the Surface data 
-  OrbitColorscaleName: counterpart of the corresponding argument for the Surface data
-  PlotTitle: A title which is displayed on the top of the plot.
-RETURNS: a string containing information about the Data
+    SurfaceFilename: The file which contains data for a surface. If empty string then no surface will be plotted. 
+                     CSV format: Time,Lat,Lon,Alt,value. Contains the data for the sphere surface. 
+                     NetCDF format: see Daedalus User Manual
+    SurfaceVariableToPlot: The name of the variable to read from the surface data file and plot upon the globe.
+    SurfaceColorbarTitle: A title to display above the colorbar which refers to the surface data
+    SurfaceColorscaleName: The name of the Colorscale to use for the surface data. 
+                           In case an empty string is passed then a default HeatMap colorscale will be applied.
+                           In case None is passed then all points will be black irrespective of value.
+    OrbitFilename: counterpart of the corresponding argument for the Surface data
+    OrbitVariableToPlot: counterpart of the corresponding argument for the Surface data 
+    OrbitColorbarTitle: counterpart of the corresponding argument for the Surface data 
+    OrbitColorscaleName: counterpart of the corresponding argument for the Surface data
+    PlotTitle: A title which is displayed on the top of the plot.
+OPTIONAL ARGUMENTS
+    VectorsFilename: The NetCDF file which contains data for a vector plot. A cone will be displayed for each lat-lon pair.
+    VectorsVariablesToPlot: a string of 3 NetCDF variables separated by comma. They represent the x,y,z components.
+    VectorsColorbarTitle: A title to display above the colorbar which refers to the vector data
+    VectorsColorscaleName: The name of the Colorscale to use for the vector data. 
+    SurfaceOpacity: a float between 0 and 1 which defines how opaque or transparent the surface will be displayed
+    LogScale: True or False. If True then log10(x) will be applied to all data values.
+    VectorConeSize: how big the vector cones will be displayed
+    VectorConeOpacity: a float between 0 and 1 which defines how opaque or transparent the vector cones will be displayed
+    SurfaceMultiplicationFactor: the surface data values will be multiplied by this value before plotting
+    OrbitMultiplicationFactor: the orbit data values will be multiplied by this value before plotting
+    VectorsMultiplicationFactor: the vectors data values will be multiplied by this value before plotting
+    OneSizeVectorCones: if True then all cones will have the same size, but different color according to the vector's length
+    SurfaceTimestep: the timestep where the surface data to be plotted belong. This is parameter of the NetCDF file.
+    SurfacePressureLevel: the pressure level where the surface data to be plotted belong. This is parameter of the NetCDF file.
+    VectorsTimestep: the timestep where the vector data to be plotted belong. This is parameter of the NetCDF file.
+    VectorsPressureLevel: the pressure level where the vector data to be plotted belong. This is parameter of the NetCDF file.
+RETURNS: a string containing general information about the Data
 '''
-def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, SurfaceColorscaleName, OrbitFilename, OrbitVariableToPlot, OrbitColorbarTitle, OrbitColorscaleName, PlotTitle, VectorsFilename="", VectorsVariablesToPlot="", VectorsColorbarTitle="", VectorsColorscaleName="Jet", SurfaceOpacity=0.90, LogScale=False ):
+def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, SurfaceColorscaleName, OrbitFilename, OrbitVariableToPlot, OrbitColorbarTitle, OrbitColorscaleName, PlotTitle, VectorsFilename="", VectorsVariablesToPlot="", VectorsColorbarTitle="", VectorsColorscaleName="Jet", SurfaceOpacity=0.90, LogScale=False, VectorConeSize=44, VectorConeOpacity=1, SurfaceMultiplicationFactor=1, OrbitMultiplicationFactor=1, VectorsMultiplicationFactor=1, OneSizeVectorCones=False, SurfaceTimestep= 1, SurfacePressureLevel=0, VectorsTimestep=1, VectorsPressureLevel=0 ):
+    global theSurfaceTimestep
+    global theSurfacePressureLevel
+    global theVectorsTimestep
+    global theVectorsPressureLevel
+    
     result = ""
     startSecs = time.time()
+    
+    theSurfaceTimestep      = SurfaceTimestep
+    theSurfacePressureLevel = SurfacePressureLevel
+    theVectorsTimestep      = VectorsTimestep
+    theVectorsPressureLevel = VectorsPressureLevel
 
     global theSurfaceOpacity
     theSurfaceOpacity = SurfaceOpacity
@@ -233,6 +267,8 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     #### read the Data file into an Array
     if len(SurfaceFilename) > 0:
         SurfaceData =  SurfaceFile_to_array( SurfaceFilename, SurfaceVariableToPlot ) 
+        if SurfaceMultiplicationFactor != 1:
+            SurfaceData = SurfaceData * SurfaceMultiplicationFactor
         if LogScale:
             for i in range(len(SurfaceData)):
                 for j in range(len(SurfaceData[i])):
@@ -242,24 +278,28 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
                         SurfaceData[i][j] = math.log( SurfaceData[i][j], 10 )
                     else:
                         SurfaceData[i][j] = -1 * math.log( abs(SurfaceData[i][j]), 10 ) 
-
     else:
         SurfaceData = None
+        
     
     #### read the Orbit Data file into an Array
-    OrbitData =  OrbitFile_to_array( OrbitFilename, OrbitVariableToPlot )
-    if LogScale  and  (OrbitData is not None):
-        for i in range(len(OrbitData)):
-            if OrbitData[i][3] == 0:
-                OrbitData[i][3] = OrbitData[i][3]
-            elif OrbitData[i][3] > 0:
-                OrbitData[i][3] = math.log( OrbitData[i][3], 10 )
-            else:
-                OrbitData[i][3] = -1 * math.log( abs(OrbitData[i][3]), 10 )
+    if len(OrbitFilename) > 0:
+        OrbitData =  OrbitFile_to_array( OrbitFilename, OrbitVariableToPlot )
+        if OrbitMultiplicationFactor != 1:
+            OrbitData = OrbitData * OrbitMultiplicationFactor    
+        if LogScale  and  (OrbitData is not None):
+            for i in range(len(OrbitData)):
+                if OrbitData[i][3] == 0:
+                    OrbitData[i][3] = OrbitData[i][3]
+                elif OrbitData[i][3] > 0:
+                    OrbitData[i][3] = math.log( OrbitData[i][3], 10 )
+                else:
+                    OrbitData[i][3] = -1 * math.log( abs(OrbitData[i][3]), 10 )
+    else:
+        OrbitData = None
 
-   
 
-    #### Calculate min / max values of all plotable data 
+    #### Calculate min / max values for surface and orbit data 
     # calculate min/max for the surface data
     if len(SurfaceFilename) > 0:
         SurfaceMin = np.amin(SurfaceData)
@@ -275,7 +315,7 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
             SurfaceMax = max( SurfaceMax, OrbitMax)
             OrbitMin = SurfaceMin
             OrbitMax = SurfaceMax
-            
+           
     # add all visual elements in a list and assign them to a figure
     Plotables = list()
     Plotables.append( EarthSurface )
@@ -311,9 +351,19 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
                 V_Lats.append( (N+300) * math.cos(aLat) * math.cos(aLon) )
                 V_Lons.append( (N+300) * math.cos(aLat) * math.sin(aLon) )
                 V_Alts.append( (N+300) * math.sin(aLat) ) # V_Alts.append( ((1-e*e)*N+500) * math.sin(aLat) )
-                VectorX.append( CDFroot.variables[varXname][1,0,latidx,lonidx] )
-                VectorY.append( CDFroot.variables[varYname][1,0,latidx,lonidx] )
-                VectorZ.append( CDFroot.variables[varZname][1,0,latidx,lonidx] )
+                
+                # For Neutral Winds "UN,VN,WN", the ENU east,north,up coordinates have to be transformed to ECEF x,y,z coordinates
+                if VectorsVariablesToPlot == "UN,VN,WN":
+                    tmpX, tmpY, tmpZ = ENU_to_ECEF( aLat, aLon, CDFroot.variables["UN"][theVectorsTimestep,theVectorsPressureLevel,latidx,lonidx], CDFroot.variables["VN"][theVectorsTimestep,theVectorsPressureLevel,latidx,lonidx], CDFroot.variables["WN"][theVectorsTimestep,theVectorsPressureLevel,latidx,lonidx] )
+                else:
+                    tmpX = CDFroot.variables[varXname][theVectorsTimestep,theVectorsPressureLevel,latidx,lonidx]
+                    tmpY = CDFroot.variables[varYname][theVectorsTimestep,theVectorsPressureLevel,latidx,lonidx]
+                    tmpZ = CDFroot.variables[varZname][theVectorsTimestep,theVectorsPressureLevel,latidx,lonidx]
+                    
+                VectorX.append( tmpX )
+                VectorY.append( tmpY )
+                VectorZ.append( tmpZ )
+                    
                 lonidx = lonidx + 1
             latidx = latidx + 1
         CDFroot.close()
@@ -334,6 +384,10 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
         #VectorY = VectorY[::step]
         #VectorZ = VectorZ[::step]
         
+        if VectorsMultiplicationFactor != 1:
+            VectorX = VectorX * VectorsMultiplicationFactor
+            VectorY = VectorY * VectorsMultiplicationFactor
+            VectorZ = VectorZ * VectorsMultiplicationFactor
         if LogScale:
             for i in range(len(VectorX)):
                 if VectorX[i] == 0:
@@ -359,24 +413,38 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
                     
 
         
-        VectorCones = dict(type='cone',
-              x=V_Lats,  y=V_Lons,  z=V_Alts,
-              u=VectorX, v=VectorY, w=VectorZ,
-              sizemode='scaled', sizeref=44,
-              colorscale=VectorsColorscaleName, anchor='tip',
-              colorbar=dict(thickness=20, len=0.75, ticklen=4, title=dict(text=VectorsColorbarTitle,side="top"), xanchor="center", x=0) 
-        )
-        
-        #VectorCones = dict( type = "scatter3d", mode = "markers", x = V_Lats,  y = V_Lons,  z = V_Alts, showlegend = False, marker = dict(  size=3, color = Ex, colorscale = "Jet",  ),  )
-        
-        Plotables.append( VectorCones )
+        if OneSizeVectorCones: # zoro
+            '''
+            # TODO: calculate VectorsMin VectorsMax
+            VectorsMin = 0
+            VectorsMax = 100
+            for i in range( 0, len(VectorX)-1, 1 ):
+                #print( i, V_Lats[i], V_Lons[i],  V_Alts[i], " ~~ ", VectorX[i], VectorY[i], VectorZ[i] )
+                SingleVectorCone = dict(type='cone', x=[V_Lats[i]],  y=[V_Lons[i]],  z=[V_Alts[i]],  u=[VectorX[i]], v=[VectorY[i]], w=[VectorZ[i]],
+                    cmin = VectorsMin, cmax = VectorsMax,
+                    sizemode='absolute', sizeref=VectorConeSize, opacity=VectorConeOpacity, colorscale=VectorsColorscaleName, anchor='tip'
+                )
+                Plotables.append( SingleVectorCone )
+                '''
+            
+            VectorCones = dict(type='cone', x=V_Lats,  y=V_Lons,  z=V_Alts,   u=VectorX, v=VectorY, w=VectorZ,
+                sizemode='scaled', sizeref=VectorConeSize, opacity=VectorConeOpacity, colorscale=VectorsColorscaleName, anchor='tip',
+                colorbar=dict(thickness=20,len=0.75,ticklen=4,title=dict(text=VectorsColorbarTitle,side="top"),xanchor="center",x=0) 
+            )        
+            Plotables.append( VectorCones )            
+        else :
+            VectorCones = dict(type='cone', x=V_Lats,  y=V_Lons,  z=V_Alts,   u=VectorX, v=VectorY, w=VectorZ,
+                sizemode='scaled', sizeref=VectorConeSize, opacity=VectorConeOpacity, colorscale=VectorsColorscaleName, anchor='tip',
+                colorbar=dict(thickness=20,len=0.75,ticklen=4,title=dict(text=VectorsColorbarTitle,side="top"),xanchor="center",x=0) 
+            )        
+            Plotables.append( VectorCones )
     
 
-    fig = dict( data=Plotables, layout=theLayout )
     # plot all
-    # ZORO UNCOMMENT:
+    fig = dict( data=Plotables, layout=theLayout )
     plotly.offline.init_notebook_mode(connected=True)
     plotly.offline.iplot(fig)
+    
     
     finishSecs = time.time()
     # be verbose
@@ -386,8 +454,8 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
     if len(OrbitFilename) > 0: result = result + "Number of Orbit positions: "  + str(len(OrbitData)) + "\n"    
         
         
-    ########### Plot a Polar Chart of the surface-data and  orbit-data ()                 ###########
-    ########### infor from https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection ###########
+    ########### Plot a Polar Chart of the surface-data and  orbit-data                   ###########
+    ########### info from https://en.wikipedia.org/wiki/Azimuthal_equidistant_projection ###########
     PolarPlotables = list()
 
     # for the Surface
@@ -480,11 +548,10 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
             )
             PolarPlotables.append( Lines )
         ## add a label for each line indicating the latitude number
-        XXXXX = np.arange( 140+555, 2000, 555 )
-        print( XXXXX )
+        labelsXpos = np.arange( 140+555, 2000, 555 )
         labels = dict( 
             type = "scatter3d", mode = "text", opacity = 0.7, showlegend=False,
-            x=XXXXX, y=[0,0,0], z=[0,0,0], text=["80", "70", "60"],
+            x=labelsXpos, y=[0,0,0], z=[0,0,0], text=["80", "70", "60"],
         )
         PolarPlotables.append( labels )
             
@@ -536,7 +603,7 @@ def PlotGlobe( SurfaceFilename, SurfaceVariableToPlot, SurfaceColorbarTitle, Sur
         #PolarPlotables.append( OrbitPolarScatter )
     '''
         
-    #### Plot the polar charts 
+    #### Plot the polar chart 
     if len(PolarPlotables) > 0:
         fig = dict( data=PolarPlotables, layout=theLayout )
         plotly.offline.init_notebook_mode(connected=True)
@@ -567,10 +634,19 @@ def CalculateAltitudeFromData( SurfaceFilename ):
         CDFroot = Dataset( SurfaceFilename, 'r' )
         try:
             result = CDFroot.variables["altitude"][0]
+            if result==0: 
+                result = 2
         except:
-            result=0 # TODO: convert pressure levels to altitude
-        if result==0: 
-            result = 2
+            try:
+                # convert pressure levels to altitudes
+                result = EarthRadius + CDFroot.variables["ZG"][theSurfaceTimestep,theSurfacePressureLevel,:,:] /100000# Geometric Height in cm. float ZG(time=17, ilev=29, lat=36, lon=72)
+                result[10][40] = result[10][40]+800 # Athens
+                if len(result) > 36: # TODO explain or correct
+                    result = result[0::2, 0::2]
+                print( "Converted pressure levels to altitudes." )
+                result = np.mean( result ) - EarthRadius # TODO: make it work as blob
+            except:
+                result = 100
         CDFroot.close()
     ##
     return result
@@ -683,7 +759,7 @@ def SurfaceFile_to_array( SurfaceFilename, VariableName ):
                             DataGrid[i, j] = RawData[x, 3]
                             break
         else: # the Panoply-oriented format for surfaces is used
-            DataGrid = np.asarray(CDFroot.variables[VariableName][1,0,:,:] , dtype=np.float64)
+            DataGrid = np.asarray(CDFroot.variables[VariableName][theSurfaceTimestep,theSurfacePressureLevel,:,:] , dtype=np.float64)
             if len(DataGrid) > 36: # TODO explain or correct
                 DataGrid = DataGrid[0::2, 0::2]
         ##
@@ -715,7 +791,7 @@ def OrbitFile_to_array( OrbitFilename, VariableName ):
 ###################################################################################################
 
 
-# Creates a dictionary containing all information needed to Plotly in order to plot a spherical surface around the earth
+# Creates a dictionary containing all information needed to plot a spherical surface around the earth
 # with data from the surface-data-file.
 # Arguments:
 #     Data: the data in 2D array to be plotted. The item Data[0,0] represents the value at Lat=87.5 and Lon=-180. This array can be cosntructed by the function SurfaceFile_to_array from a csv or netCDF file.
@@ -744,11 +820,6 @@ def CreatePlotable_Surface( Data, Altitude, MinValue, MaxValue , ColorScale, Col
     except:
         print( "Data NOT shifted." )
     
-    # cut out a pizza slice
-    #for i in range (0,16):
-    #    for j in range (0,16):
-    #        Data[i,j] = float('nan')
-    
     # To ensure color continuity we extend the lon list with [180] (its last value was lon[-1]=177.5). In this way we can identify lon=-180 with lon=180.
     # We do the same with latitudes. We extend both directions with [90] and [-90] in order to have values for the poles.
     clons = np.array( lon.tolist() + [180]        , dtype=np.float64)
@@ -756,6 +827,20 @@ def CreatePlotable_Surface( Data, Altitude, MinValue, MaxValue , ColorScale, Col
     clons, clats=np.meshgrid(clons, clats)
     # Map the meshgrids clons, clats onto the sphere
     if isinstance(Altitude, np.ndarray): 
+        cAltitude = np.array( Altitude )
+        cAltitude[0,0] = cAltitude[0,0] + 500
+        cAltitude = np.vstack(( cAltitude, cAltitude[35] ))
+        cAltitude = np.vstack(( cAltitude, cAltitude[ 0] ))
+
+        Altitude = np.hstack((cAltitude[:,i_west], cAltitude[:,i_east]))
+        
+        tmp_array = (Altitude[:,0]+Altitude[:,71])/2
+        tmp_array = np.reshape( tmp_array, (38,1) )
+        Altitude = np.hstack(( Altitude, tmp_array ))
+
+        print( "cAltitude.shape =", cAltitude.shape )
+        print( "Altitude.shape =", Altitude.shape )
+        print( "Data.shape =", Data.shape )
         XS, YS, ZS = mapping_map_to_blob(clons, clats, Altitude)
     else:
         XS, YS, ZS = mapping_map_to_sphere(clons, clats, radius=EarthRadius+Altitude)
@@ -797,12 +882,7 @@ def CreatePlotable_PolarSurface( Data, MinValue, MaxValue, ColorScale, ColorbarT
         Data = np.hstack((Data_ground[:,i_west], Data_ground[:,i_east]))
     except:
         print( "Data NOT shifted." )
-    
-    # cut out a pizza slice
-    #for i in range (0,16):
-    #    for j in range (0,16):
-    #        Data[i,j] = float('nan')
-    
+        
     # To ensure color continuity we extend the lon list with [180] (its last value was lon[-1]=177.5). In this way we can identify lon=-180 with lon=180.
     # We do the same with latitudes. We extend both directions with [90] and [-90] in order to have values for the poles.
     clons = np.array( lon.tolist() + [180]        , dtype=np.float64)
@@ -887,6 +967,21 @@ def CreatePlotable_Orbit( OrbitData, MinValue, MaxValue, ColorScale, ColorbarTit
 
 
 
+'''
+Converts the ENU east,north,up coordinates to ECEF x,y,z coordinates
+https://en.wikipedia.org/wiki/Geographic_coordinate_conversion#From_ENU_to_ECEF
+'''
+def ENU_to_ECEF( LatRadians, LonRadians, EastSpeed, NorthSpeed, UpSpeed ):
+    #F = Lat * pi/180 # consider (90-Lat)*pi/180   
+    #L = Lon * pi/180
+    F = LatRadians
+    L = LonRadians
+    Ux = -sin(L)*EastSpeed + -sin(F)*cos(L)*NorthSpeed + cos(F)*cos(L)*UpSpeed
+    Uy =  cos(L)*EastSpeed + -sin(F)*sin(L)*NorthSpeed + cos(F)*sin(L)*UpSpeed
+    Uz =       0*EastSpeed +         cos(F)*NorthSpeed +        sin(F)*UpSpeed
+    return Ux, Uy, Uz
+    
+
 
 '''
 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
@@ -900,7 +995,7 @@ Zero Point	0		0			SurfaceData[18][36] = 50000 # Zero Point
 Sydney 		-34		151			SurfaceData[22][66] = 50000 # Sydney
 Santiago	-33		-70			SurfaceData[24][22] = 50000 # Santiago
 Tokyo		35		140			SurfaceData[10][64] = 50000 # Tokyo
-NY			41.25	-75			SurfaceData[9][21] = 50000 # NY
+NY			41.25	-75			SurfaceData[9][21]  = 50000 # NY
 Athens		38		23			SurfaceData[10][40] = 50000 # Athens
 '''
 
