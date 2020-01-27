@@ -1,6 +1,9 @@
 import sys
 sys.path.insert(1, '../../SourceCode/ModulesSourceCode/PlotGlobe')
 import PlotGlobe as PlotGlobe
+sys.path.insert(1, '../../SourceCode/')
+import DaedalusGlobals as DaedalusGlobals
+
 
 from netCDF4 import Dataset
 import ipywidgets as w
@@ -47,7 +50,7 @@ def Get_NetCDF_Variables( NetCDF_filename ):
 def Orbit_Filename_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # load available variables of the NetCDF file and propose them to user
-        filename = "/home/NAS/Data_Files/OrbitData/DAED_ORB_"
+        filename = DaedalusGlobals.Orbit_Files_Path + "DAED_ORB_"
         filename += Orbit_EventDropdown.value + "_"
         filename += Orbit_DataFormatDropdown.value + "_"
         filename += Orbit_PerigeeDropdown.value + "_"
@@ -61,7 +64,7 @@ def Orbit_Filename_onChange(change):
 def Surface_TypeDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # display available event folder names at the dropdown menu
-        AllEvents = glob.glob( "/home/NAS/"+str(change['new'])+"/"+str(change['new'])[0:4]+"*" )
+        AllEvents = glob.glob( DaedalusGlobals.AllData_Files_Path+str(change['new'])+"/"+str(change['new'])[0:4]+"*" )
         for i in range(0, len(AllEvents)):
             AllEvents[i] = AllEvents[i][ AllEvents[i].rfind('/')+1 : ]                
         AllEvents.sort()
@@ -69,7 +72,7 @@ def Surface_TypeDropdown_onChange(change):
 def Surface_EventDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # display available data file names at the dropdown menu
-        AllDataFiles = glob.glob( "/home/NAS/"+Surface_TypeDropdown.value+"/"+str(change['new'])+"/*.nc" )
+        AllDataFiles = glob.glob( DaedalusGlobals.AllData_Files_Path +Surface_TypeDropdown.value+"/"+str(change['new'])+"/*.nc" )
         for i in range(0, len(AllDataFiles)):
             AllDataFiles[i] = AllDataFiles[i][ AllDataFiles[i].rfind('/')+1 : ]
         AllDataFiles.sort()
@@ -77,13 +80,13 @@ def Surface_EventDropdown_onChange(change):
 def Surface_DatafileDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # load available variables of the NetCDF file and propose them to user
-        AllVariables = Get_NetCDF_Variables( "/home/NAS/"+Surface_TypeDropdown.value+"/"+Surface_EventDropdown.value+"/"+str(change['new']) )
+        AllVariables = Get_NetCDF_Variables( DaedalusGlobals.AllData_Files_Path +Surface_TypeDropdown.value+"/"+Surface_EventDropdown.value+"/"+str(change['new']) )
         Surface_VariableDropdown.options = AllVariables
     
 def Vectors_TypeDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # display available event folder names at the dropdown menu
-        AllEvents = glob.glob( "/home/NAS/"+str(change['new'])+"/"+str(change['new'])[0:4]+"*" )
+        AllEvents = glob.glob( DaedalusGlobals.AllData_Files_Path+str(change['new'])+"/"+str(change['new'])[0:4]+"*" )
         for i in range(0, len(AllEvents)):
             AllEvents[i] = AllEvents[i][ AllEvents[i].rfind('/')+1 : ]                
         AllEvents.sort()
@@ -91,7 +94,7 @@ def Vectors_TypeDropdown_onChange(change):
 def Vectors_EventDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # display available data file names at the dropdown menu
-        AllDataFiles = glob.glob( "/home/NAS/"+Vectors_TypeDropdown.value+"/"+str(change['new'])+"/*.nc" )
+        AllDataFiles = glob.glob( DaedalusGlobals.AllData_Files_Path +Vectors_TypeDropdown.value+"/"+str(change['new'])+"/*.nc" )
         for i in range(0, len(AllDataFiles)):
             AllDataFiles[i] = AllDataFiles[i][ AllDataFiles[i].rfind('/')+1 : ]        
         AllDataFiles.sort()
@@ -99,7 +102,7 @@ def Vectors_EventDropdown_onChange(change):
 def Vectors_DatafileDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # load available variables of the NetCDF file and propose them to user
-        AllVariables = Get_NetCDF_Variables( "/home/NAS/"+Vectors_TypeDropdown.value+"/"+Vectors_EventDropdown.value+"/"+str(change['new']) )
+        AllVariables = Get_NetCDF_Variables( DaedalusGlobals.AllData_Files_Path +Vectors_TypeDropdown.value+"/"+Vectors_EventDropdown.value+"/"+str(change['new']) )
         Vectors_VarXDropdown.options = AllVariables
         Vectors_VarYDropdown.options = AllVariables
         Vectors_VarZDropdown.options = AllVariables
@@ -150,7 +153,7 @@ def plot_button_clicked( b ):
     ####
     SurfaceVariableToPlot = Surface_VariableDropdown.value[:Surface_VariableDropdown.value.find('(')-1].strip()
     if( len(SurfaceVariableToPlot) > 0 ):
-        SurfaceFilename  = "/home/NAS/" + Surface_TypeDropdown.value + "/" + Surface_EventDropdown.value
+        SurfaceFilename  = DaedalusGlobals.AllData_Files_Path + Surface_TypeDropdown.value + "/" + Surface_EventDropdown.value
         SurfaceFilename += "/" + Surface_DatafileDropdown.value
         SurfaceColorbarTitle = Surface_ColorbartitleText.value
         SurfaceColorscaleName = Surface_ColorscaleText.value
@@ -161,7 +164,7 @@ def plot_button_clicked( b ):
     ####
     OrbitVariableToPlot = Orbit_VariableDropdown.value[:Orbit_VariableDropdown.value.find('(')-1].strip()
     if( len(OrbitVariableToPlot) > 0 ):
-        OrbitFilename = "/home/NAS/Data_Files/OrbitData/DAED_ORB_"
+        OrbitFilename = DaedalusGlobals.Orbit_Files_Path +" DAED_ORB_"
         OrbitFilename += Orbit_EventDropdown.value + "_"
         OrbitFilename += Orbit_DataFormatDropdown.value + "_"
         OrbitFilename += Orbit_PerigeeDropdown.value + "_"
@@ -176,7 +179,7 @@ def plot_button_clicked( b ):
     VectorsVariablesToPlot += Vectors_VarYDropdown.value[:Vectors_VarYDropdown.value.find('(')-1].strip() + ","
     VectorsVariablesToPlot += Vectors_VarZDropdown.value[:Vectors_VarZDropdown.value.find('(')-1].strip()
     if( len(VectorsVariablesToPlot) > 2 ):
-        VectorsFilename  = "/home/NAS/" + Vectors_TypeDropdown.value + "/" + Vectors_EventDropdown.value
+        VectorsFilename  = DaedalusGlobals.AllData_Files_Path + Vectors_TypeDropdown.value + "/" + Vectors_EventDropdown.value
         VectorsFilename += "/" + Vectors_DatafileDropdown.value 
         VectorsColorbarTitle = Vectors_ColorbartitleText.value
         VectorsColorscaleName = Vectors_ColorscaleText.value
