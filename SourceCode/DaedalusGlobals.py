@@ -5,11 +5,21 @@ In case you need some variable to be added here, please contact the Daedalus tea
 '''
 
 
-# Absolute path where the CSV filenames with the orbit data reside.
-CSV_Files_Path = "/home/NAS/Data_Files/OrbitData/" 
 
-# Absolute path where the NetCDF filenames with the orbit data reside.
-NetCDF_Files_Path = "/home/NAS/Data_Files/OrbitData/" 
+# Absolute path where the files with the orbit data reside.
+Orbit_Files_Path  = "/home/NAS/Data_Files/OrbitData/"
+CSV_Files_Path = "/home/NAS/Data_Files/OrbitData/" 
+NetCDF_Files_Path = "/home/NAS/Data_Files/OrbitData/"
+
+# Absolute parent path where all data files are stored
+AllData_Files_Path = "/home/NAS/"
+
+# Absolute path where the TIEGCM data files are stored
+TIEGCM_Files_Path = "/home/NAS/TIEGCM_DATA/"
+
+# Absolute path where the WACCAM-X data files are stored
+WACCAMX_Files_Path = "/home/NAS/WACCAM_X/"
+
 
 
 # Absolute path where the filenames with calculated values reside.
