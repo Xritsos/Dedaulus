@@ -23,21 +23,25 @@ ColorScales = [
 
 
 # returns a list of all the variables and their properties in the NetCDF file
-def Get_NetCDF_Variables( NetCDF_filename ):
+def Get_NetCDF_VariablesInfo( NetCDF_filename ):
     NetCDF = Dataset(NetCDF_filename, 'r')
+    ##
     AllVariables = [""]
     for V in NetCDF.variables:
         Vdtype = Vunits = Vlongname = ""
         try:
             Vdtype = "(" + NetCDF.variables[V].dtype + ") "
+            Vdtype = Vdtype.replace("() ","")
         except:
             pass
         try:
-            Vunits = "(" + NetCDF.variables[V].units + ") "
+            Vunits = "[" + NetCDF.variables[V].units + "] "
+            Vunits = Vunits.replace("[] ","")
         except:
             pass
         try:
             Vlongname = "(" +NetCDF.variables[V].long_name + ") "
+            Vlongname = Vlongname.replace("() ","")
         except:
             pass
         AllVariables.append( V + "   " + Vlongname +  Vunits + Vdtype )
@@ -58,8 +62,12 @@ def Orbit_Filename_onChange(change):
         filename += Orbit_SamplingDropdown.value + "_"
         filename += Orbit_SpacecraftDropdown.value
         filename += ".nc"
-        AllVariables = Get_NetCDF_Variables( filename )
-        Orbit_VariableDropdown.options = AllVariables
+        try:
+            AllVariables = Get_NetCDF_VariablesInfo( filename )
+            Orbit_VariableDropdown.options = AllVariables
+        except:
+            pass
+            
 
 def Surface_TypeDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
@@ -80,7 +88,7 @@ def Surface_EventDropdown_onChange(change):
 def Surface_DatafileDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # load available variables of the NetCDF file and propose them to user
-        AllVariables = Get_NetCDF_Variables( DaedalusGlobals.AllData_Files_Path +Surface_TypeDropdown.value+"/"+Surface_EventDropdown.value+"/"+str(change['new']) )
+        AllVariables = Get_NetCDF_VariablesInfo( DaedalusGlobals.AllData_Files_Path +Surface_TypeDropdown.value+"/"+Surface_EventDropdown.value+"/"+str(change['new']) )
         Surface_VariableDropdown.options = AllVariables
     
 def Vectors_TypeDropdown_onChange(change):
@@ -102,7 +110,7 @@ def Vectors_EventDropdown_onChange(change):
 def Vectors_DatafileDropdown_onChange(change):
     if change['type']=='change' and change['name']=='value' and len(change['new'])>0:
         # load available variables of the NetCDF file and propose them to user
-        AllVariables = Get_NetCDF_Variables( DaedalusGlobals.AllData_Files_Path +Vectors_TypeDropdown.value+"/"+Vectors_EventDropdown.value+"/"+str(change['new']) )
+        AllVariables = Get_NetCDF_VariablesInfo( DaedalusGlobals.AllData_Files_Path +Vectors_TypeDropdown.value+"/"+Vectors_EventDropdown.value+"/"+str(change['new']) )
         Vectors_VarXDropdown.options = AllVariables
         Vectors_VarYDropdown.options = AllVariables
         Vectors_VarZDropdown.options = AllVariables
@@ -124,6 +132,14 @@ def Surface_Var_onChange(change):
     if Surface_VariableDropdown.value is not None and len(Surface_VariableDropdown.value)>0:
         varname = Surface_VariableDropdown.value[:Surface_VariableDropdown.value.find('(')-1].strip()
         SurfaceAccordion.set_title(0, "Surface: " + Surface_DatafileDropdown.value + " [" + varname + "]" )
+        # auto fill units, pressure level limits, timestep limits
+        NetCDF_filename = DaedalusGlobals.AllData_Files_Path +Surface_TypeDropdown.value+"/"+Surface_EventDropdown.value+"/"+Surface_DatafileDropdown.value
+        NetCDF = Dataset(NetCDF_filename, 'r')
+        Surface_ColorbartitleText.value = NetCDF.variables[varname].units
+        if len(NetCDF.variables[varname].shape) >= 2:
+            Surface_TimestepText.max = NetCDF.variables[varname].shape[0] - 1
+            Surface_PressurelevelText.max = NetCDF.variables[varname].shape[1] - 1 
+        NetCDF.close()        
     else:
         SurfaceAccordion.set_title(0, "Click here to plot a variable onto a Surface above the Earth" )
 def Vectors_Var_onChange(change):
@@ -138,6 +154,15 @@ def Vectors_Var_onChange(change):
         s +=  Vectors_VarYDropdown.value[:Vectors_VarYDropdown.value.find('(')-1].strip() + ", "
         s +=  Vectors_VarZDropdown.value[:Vectors_VarZDropdown.value.find('(')-1].strip() + "]"
         VectorsAccordion.set_title(0, s )
+        # auto fill units, pressure level limits, timestep limits
+        varname = Vectors_VarXDropdown.value[:Vectors_VarXDropdown.value.find('(')-1].strip()
+        NetCDF_filename = DaedalusGlobals.AllData_Files_Path +Vectors_TypeDropdown.value+"/"+Vectors_EventDropdown.value+"/"+Vectors_DatafileDropdown.value
+        NetCDF = Dataset(NetCDF_filename, 'r')
+        Vectors_ColorbartitleText.value = NetCDF.variables[varname].units
+        if len(NetCDF.variables[varname].shape) >= 2:
+            Vectors_TimestepText.max = NetCDF.variables[varname].shape[0] - 1
+            Vectors_PressurelevelText.max = NetCDF.variables[varname].shape[1] - 1
+        NetCDF.close()         
     else:
         VectorsAccordion.set_title(0, "Click here to plot a Vector field" )
 
@@ -164,7 +189,7 @@ def plot_button_clicked( b ):
     ####
     OrbitVariableToPlot = Orbit_VariableDropdown.value[:Orbit_VariableDropdown.value.find('(')-1].strip()
     if( len(OrbitVariableToPlot) > 0 ):
-        OrbitFilename = DaedalusGlobals.Orbit_Files_Path +" DAED_ORB_"
+        OrbitFilename = DaedalusGlobals.Orbit_Files_Path +"DAED_ORB_"
         OrbitFilename += Orbit_EventDropdown.value + "_"
         OrbitFilename += Orbit_DataFormatDropdown.value + "_"
         OrbitFilename += Orbit_PerigeeDropdown.value + "_"
@@ -268,8 +293,8 @@ Surface_Column1.children += (Surface_DatafileDropdown,)
 
 Surface_VariableDropdown = w.Dropdown( value='', options=[''], description='', style={'description_width':'50px'}, layout=layout1)
 Surface_VariableDropdown.observe( Surface_Var_onChange )
-Surface_TimestepText = w.IntText( value=0, description='Timestep:', layout=layout1)
-Surface_PressurelevelText = w.IntText( value=0, description='Pres. Level:', layout=layout1)
+Surface_TimestepText = w.BoundedIntText( value=0, min=0, description='Timestep:', layout=layout1)
+Surface_PressurelevelText = w.BoundedIntText( value=0, min=0, description='Pres. Level:', layout=layout1)
 Surface_MultiplyText = w.FloatText(value=1, description='Multiply by:', layout=layout1)
 Surface_Column2.children += (w.HTML(value="<div align='left'><b><font color='LightSeaGreen'>Select a variable:</b></div>"),)
 Surface_Column2.children += (Surface_VariableDropdown,)
@@ -311,8 +336,8 @@ Vectors_VarZDropdown = w.Dropdown( value='', options=[''], description='Z:', sty
 Vectors_VarXDropdown.observe( Vectors_Var_onChange )
 Vectors_VarYDropdown.observe( Vectors_Var_onChange )
 Vectors_VarZDropdown.observe( Vectors_Var_onChange )
-Vectors_TimestepText = w.IntText( value=0, description='Timestep:', layout=layout1)
-Vectors_PressurelevelText = w.IntText( value=0, description='Pres. Level:', layout=layout1)
+Vectors_TimestepText = w.BoundedIntText( value=0, min=0, description='Timestep:', layout=layout1)
+Vectors_PressurelevelText = w.BoundedIntText( value=0, min=0, description='Pres. Level:', layout=layout1)
 Vectors_MultiplyText = w.FloatText(value=1, description='Multiply by:', layout=layout1)
 Vectors_Column2.children += (w.HTML(value="<div align='left'><b><font color='LightSeaGreen'>Select a variable:</b></div>"),)
 Vectors_Column2.children += (Vectors_VarXDropdown,Vectors_VarYDropdown,Vectors_VarZDropdown,)
