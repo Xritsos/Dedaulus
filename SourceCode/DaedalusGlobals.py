@@ -21,6 +21,12 @@ TIEGCM_Files_Path = "/home/NAS/TIEGCM_DATA/"
 WACCAMX_Files_Path = "/home/NAS/WACCAM_X/"
 
 
+# Absolute path where the files with Geomagnetic Kp-Ap Indices are stored
+GeomagneticIndices_Files_Path = "/home/NAS/Data_Files/GeomagneticIndices/"
+
+# Absolute path where the files with Geomagnetic Kp-Ap Indices are stored
+CoverageResults_Files_Path = "/home/NAS/Data_Files/CoverageResults/"
+
 
 # Absolute path where the filenames with calculated values reside.
 Processed_Files_Path = "/home/NAS/Data_Files/ModelOutputs/" 
